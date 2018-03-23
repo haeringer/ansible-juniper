@@ -1,0 +1,9 @@
+---
+- name: Create configuration
+  connection: local
+  gather_facts: no
+# Ansible will look in roles/<role name>/tasks/main.yaml
+# to find what tasks it need to perform
+  roles:
+    - common
+    - intern-ex
