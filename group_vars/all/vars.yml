@@ -1,7 +1,6 @@
 ---
 cli:
   host: "{{ ansible_host }}"
-  #host: "{{ inventory_hostname }}"
   username: "{{ credentials['username'] }}"
   password: "{{ credentials['password'] }}"
   transport: cli
