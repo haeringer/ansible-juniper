@@ -5,3 +5,7 @@ cli:
   password: "{{ credentials['password'] }}"
   transport: cli
   timeout: 120
+
+build_dir: /var/tmp/build/{{ inventory_hostname }}/tmp
+junos_conf: /var/tmp/build/{{ inventory_hostname }}/junos.conf
+
