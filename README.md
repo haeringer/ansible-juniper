@@ -16,5 +16,13 @@ Ggf. via ansible-vault encrypt verschlüsseln; Playbooks müssen dann mit --ask-
 
 Playbook verbindet sich zu Switch und gibt via 'junos_facts'-Modul die Junos-Version aus
 
-   ansible-playbook -i hosts pb-junos-test.yml
+    ansible-playbook -i hosts pb-junos-test.yml
+
+
+## Playbook zur Konfiguration der Infrastruktur
+
+Playbook kann derzeit noch gefahrlos ausgeführt werden, da das Modul junos_config auskommentiert ist
+
+    ansible-playbook -i hosts pb-main.yml
+
 
