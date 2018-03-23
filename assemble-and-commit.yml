@@ -14,8 +14,8 @@
     - name: Assembling configuration templates
       assemble: src={{ build_dir }} dest={{ junos_conf }}
       # This notify triggers the handler. It looks for a handler with this name
-      notify:
-        - Pushing config ... please wait
+#     notify:
+#       - Pushing config ... please wait
 
 # This handler (i.e. a task triggered by a notify) uses the junos_config 
 # module to apply the configuration to the device:
