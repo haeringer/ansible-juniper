@@ -1,5 +1,6 @@
 ---
 - name: Create configuration
+  hosts: all
   connection: local
   gather_facts: no
 # Ansible will look in roles/<role name>/tasks/main.yaml
