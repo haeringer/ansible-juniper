@@ -1,0 +1,21 @@
+---
+- name: Get Device Facts
+  hosts: all
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - name: Checking NETCONF connectivity
+      wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 830
+        timeout: 5
+
+    - name: Retrieving information from devices running Junos OS
+      junos_facts:
+        provider: "{{ cli }}"
+      register: junosfacts
+
+    - name: Print Junos version
+      debug: var=junosfacts['ansible_facts']['ansible_net_version']
