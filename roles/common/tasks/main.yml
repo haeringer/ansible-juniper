@@ -1,0 +1,5 @@
+---
+- name: Build common configuration using Jinja2 template
+  template: >
+    src=main.conf.j2
+    dest={{ build_dir }}/common.conf.part

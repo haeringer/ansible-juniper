@@ -1,0 +1,5 @@
+---
+- name: Build internal EX specific part of configuration via Jinja2 template
+  template: >
+    src=main.conf.j2
+    dest={{ build_dir }}/main.conf.part
