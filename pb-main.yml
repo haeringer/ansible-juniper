@@ -1,5 +1,5 @@
 ---
 # This playbook will generate and apply configuration to all of the devices
-- include: cleanup.yml
-- include: intern-ex.yml
-- include: assemble-and-commit.yml
+- import_playbook: cleanup.yml
+- import_playbook: intern-ex.yml
+- import_playbook: assemble-and-commit.yml
