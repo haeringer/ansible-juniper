@@ -13,9 +13,9 @@ Ggf. via `ansible-vault encrypt` verschlüsseln; Playbooks müssen dann mit `--a
     vi /group_vars/all/credentials.yml
 
 
-## Playbook für NETCONF Verbindungstest
+## Test-Playbook
 
-Playbook verbindet sich zu Switch und gibt via 'junos_facts'-Modul die Junos-Version aus
+Playbook macht NETCONF-Verbindungstest und gibt über unterschiedliche Module die Junos-Version aus
 
     ansible-playbook -i hosts junos-test.yml
 

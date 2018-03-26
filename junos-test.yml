@@ -14,20 +14,28 @@
         port: 830
         timeout: 5
 
-    - name: Retrieve Junos Version via junos_facts Modul
+    - name: Retrieve Junos version via junos_facts module
       junos_facts:
         provider: "{{ netconf_core }}"
       register: junosfacts
-
-    - name: Retrieve Junos Version via juniper_junos_command Module
+    - name: junos_facts Output...
+      debug: var=junosfacts['ansible_facts']['ansible_net_version']
+    
+    - name: Retrieve Junos version via juniper_junos_command module
       juniper_junos_command:
         provider: "{{ netconf_juniper }}"
         commands:
           - "show version"
       register: juniperjunoscommand
-
-    - name: junos_facts Output...
-      debug: var=junosfacts['ansible_facts']['ansible_net_version']
-    
     - name: juniper_junos_command Output...
       debug: var=juniperjunoscommand
+
+    - name: Retrieve Junos version via juniper_junos_rpc module
+      juniper_junos_rpc:
+        provider: "{{ netconf_juniper }}"
+        rpcs:
+          - "get-software-information"
+#       return_output: false
+      register: juniperjunosrpc
+    - name: juniper_junos_rpc Output...
+      debug: var=juniperjunosrpc
