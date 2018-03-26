@@ -3,6 +3,8 @@
   hosts: all
   connection: local
   gather_facts: no
+  roles:
+    - Juniper.junos
 
   tasks:
 
@@ -12,10 +14,20 @@
         port: 830
         timeout: 5
 
-    - name: Retrieving information from devices running Junos OS
+    - name: Retrieve Junos Version via junos_facts Modul
       junos_facts:
-        provider: "{{ netconf }}"
+        provider: "{{ netconf_core }}"
       register: junosfacts
 
-    - name: Print Junos version
+    - name: Retrieve Junos Version via juniper_junos_command Module
+      juniper_junos_command:
+        provider: "{{ netconf_juniper }}"
+        commands:
+          - "show version"
+      register: juniperjunoscommand
+
+    - name: junos_facts Output...
       debug: var=junosfacts['ansible_facts']['ansible_net_version']
+    
+    - name: juniper_junos_command Output...
+      debug: var=juniperjunoscommand
