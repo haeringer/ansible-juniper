@@ -23,6 +23,6 @@
 # handlers:
 #   - name: Pushing config ... please wait
 #     junos_config:
-#       provider: "{{ cli }}"
+#       provider: "{{ netconf }}"
 #       src: "{{ junos_conf }}"
 #action: overwrite

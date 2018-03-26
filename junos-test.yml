@@ -14,7 +14,7 @@
 
     - name: Retrieving information from devices running Junos OS
       junos_facts:
-        provider: "{{ cli }}"
+        provider: "{{ netconf }}"
       register: junosfacts
 
     - name: Print Junos version

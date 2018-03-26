@@ -1,9 +1,9 @@
 ---
-cli:
+netconf:
   host: "{{ ansible_host }}"
   username: "{{ credentials['username'] }}"
   password: "{{ credentials['password'] }}"
-  transport: cli
+  transport: netconf
   timeout: 120
 
 build_dir: /var/tmp/build/{{ inventory_hostname }}/tmp
