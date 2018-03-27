@@ -6,8 +6,7 @@
 
 - name: Build configuration
   hosts: all
-  connection: local
-  gather_facts: no
+  connection: netconf
 
   tasks:
 
@@ -23,6 +22,5 @@
 # handlers:
 #   - name: Pushing config ... please wait
 #     junos_config:
-#       provider: "{{ netconf }}"
 #       src: "{{ junos_conf }}"
 #action: overwrite

@@ -1,17 +1,4 @@
 ---
-netconf_core:
-  host: "{{ ansible_host }}"
-  username: "{{ credentials['username'] }}"
-  password: "{{ credentials['password'] }}"
-  timeout: 120
-  transport: netconf
-
-netconf_juniper:
-  host: "{{ ansible_host }}"
-  username: "{{ credentials['username'] }}"
-  password: "{{ credentials['password'] }}"
-  timeout: 120
-
 build_dir: /var/tmp/build/{{ inventory_hostname }}/tmp
 junos_conf: /var/tmp/build/{{ inventory_hostname }}/junos.conf
 

@@ -1,29 +1,30 @@
-## Info
+## Requirements
 
-Repository basiert auf Ansible Release 2.4.3.0.
+Ansible Release **2.5.0** (Playbooks sind nicht abwärtskompatibel!)
 
+Außerdem Juniper Ansible Galaxy Role inkl. Abhängigkeiten:
 
-## Loslegen
-
-Repository klonen und eigene Junos-Logindaten in credentials.yml eintragen. 
-Ggf. via `ansible-vault encrypt` verschlüsseln; Playbooks müssen dann mit `--ask-vault-pass` ausgeführt werden.
-
-    git clone https://gogs.intern.example.com/noc/ansible-juniper.git
-    cp /group_vars/all/credentials.example.yml /group_vars/all/credentials.yml
-    vi /group_vars/all/credentials.yml
+    pip install jxmlease junos-eznc
+    ansible-galaxy install Juniper.junos
 
 
 ## Test-Playbook
 
-Playbook macht NETCONF-Verbindungstest und gibt über unterschiedliche Module die Junos-Version aus
+Simpler NETCONF-Verbindungstest und Abfrage der Junos-Version über unterschiedliche Module
 
-    ansible-playbook -i hosts junos-test.yml
+    ansible-playbook -i hosts -u harry -k junos-test.yml
+
+##### Erklärung der Optionen:
+
+    -i       Datei mit Ziel-Devices
+    --limit  Ziel-Devices in hosts-Datei auf Gruppe limiteren, z.B. --limit "lab-ex"
+    -u       eigener Username, d.h. rancid-user in unserem Fall
+    -k       Aufforderung zur Passworteingabe (ansonsten wird SSH-Key verwendet)
 
 
 ## Playbook zur Konfiguration der Infrastruktur
 
-Playbook kann derzeit noch ohne Auswirkungen auf Produktivsysteme ausgeführt werden, da 'junos_config'-Modul auskommentiert. Es erfolgt jedoch bereits ein lokaler Build der config, so dass dieser Teil der Automation gefahrenlos getestet werden kann.
+Playbook kann derzeit noch ohne Auswirkungen auf Produktivsysteme ausgeführt werden ('junos_config'-Modul auskommentiert). Es erfolgt jedoch bereits ein lokaler Build der config, so dass dieser Teil der Automation gefahrenlos getestet werden kann.
 
-    ansible-playbook -i hosts main.yml
-
+    ansible-playbook -i hosts -u harry -k main.yml
 
