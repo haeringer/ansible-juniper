@@ -14,11 +14,11 @@ Simpler NETCONF-Verbindungstest und Abfrage der Junos-Version über unterschiedl
 
     ansible-playbook -u harry -k junos-test.yml
 
-##### Optionen:
+#### Optionen
 
-    -l     Ziel-Devices in hosts-Datei auf Gruppe limiteren, z.B. -l "lab-ex"
-    -u     eigener Username (rancid-user in unserem Fall). Nicht nötig, falls dieser dem lokalen user entspricht
+    -u     eigener Username (Tacacs-user in unserem Fall). Nicht nötig, falls dieser dem lokalen User entspricht
     -k     Aufforderung zur Passworteingabe (ansonsten wird SSH-Key verwendet)
+    -l     Ziel-Devices in hosts-Datei auf Gruppe limiteren, z.B. -l "lab-ex"
 
 
 ## Playbook zur Konfiguration der Infrastruktur

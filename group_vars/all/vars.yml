@@ -1,4 +1,7 @@
 ---
+ansible_connection: netconf
+ansible_network_os: junos
+
 build_dir: /var/tmp/build/{{ inventory_hostname }}/tmp
 junos_conf: /var/tmp/build/{{ inventory_hostname }}/junos.conf
 

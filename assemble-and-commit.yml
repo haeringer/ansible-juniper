@@ -6,7 +6,6 @@
 
 - name: Build configuration
   hosts: all
-  connection: netconf
 
   tasks:
 

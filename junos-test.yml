@@ -1,7 +1,7 @@
 ---
 - name: Get Device Facts
   hosts: all
-  connection: netconf
+# connection: netconf
   roles:
     - Juniper.junos
 
