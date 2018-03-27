@@ -1,0 +1,27 @@
+---
+# Connection Parameters
+ansible_connection: netconf
+ansible_network_os: junos
+
+# Temporary directories for building the device configs
+build_dir: /var/tmp/build/{{ inventory_hostname }}/tmp
+junos_conf: /var/tmp/build/{{ inventory_hostname }}/junos.conf
+
+# config variables
+time_zone: Europe/Berlin
+name_servers:
+  - 10.29.224.25
+  - 10.29.224.53
+  - 10.29.255.53
+tacacs_servers:
+  - ip: 10.29.224.254
+    secret: $9$BFVEhrKMX-bsWLxdbwJZ69A01heK8X-w
+ntp_servers:
+  - 10.29.224.53
+  - 10.29.255.53
+  - 194.29.226.25
+snmp_servers:
+  - 10.29.224.23
+  - 10.29.224.25
+snmp_community: exampleorg1ntern
+snmp_contact: noc@exampleorg.de

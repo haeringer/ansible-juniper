@@ -1,24 +1,23 @@
 #jinja2:lstrip_blocks: True
 {# This config is common to all Junos device types. For it to be generated the 'common' role must be included in the platform specific play file. #}
 system {
-    time-zone Europe/Berlin;
+    time-zone {{ time_zone }};
     no-redirects;
     authentication-order [ tacplus password ];
     root-authentication {
         encrypted-password "$1$rZSaOfdu$WkjrZFtNzv4rqemuUgfXL0"; ## SECRET-DATA
     }
     name-server {
-        10.29.224.25;
-        10.29.224.53;
-        10.29.255.53;
+    {% for name_server in name_servers %}
+        {{ name_server }};
+    {% endfor %}
     }
     tacplus-server {
-        10.29.224.254 {
-            port 49;
-            secret "$9$BFVEhrKMX-bsWLxdbwJZ69A01heK8X-w"; ## SECRET-DATA
-            timeout 10;
-            single-connection;
+    {% for tacacs_server in tacacs_servers %}
+        {{ tacacs_server.ip }} { 
+            secret "{{ tacacs_server.secret }}";
         }
+    {% endfor %}
     }
     services {
         ssh {
@@ -74,13 +73,14 @@ system {
         }
     }
     ntp {
-        server 10.29.224.53;
-        server 10.29.255.53;
+        {% for ntp_server in ntp_servers %}
+        server {{ ntp_server }};
+        {% endfor %}
     }
 }
 snmp {
-    contact "noc@exampleorg.de";
-    community exampleorg1ntern {
+    contact "{{ snmp_contact }}";
+    community {{ snmp_community }} {
         authorization read-only;
     }
     trap-group default {
@@ -96,8 +96,9 @@ snmp {
             configuration;
         }
         targets {
-            10.29.224.25;
-            10.29.224.23;
+        {% for snmp_server in snmp_servers %}
+            {{ snmp_server }};
+        {% endfor %}
         }
     }
 }
