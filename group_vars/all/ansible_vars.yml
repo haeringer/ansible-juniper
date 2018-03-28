@@ -1,0 +1,9 @@
+---
+# Connection Parameters
+ansible_connection: netconf
+ansible_network_os: junos
+
+# Temporary directories for building the device configs
+build_dir: /var/tmp/build/{{ inventory_hostname }}/tmp
+junos_conf: /var/tmp/build/{{ inventory_hostname }}/junos.conf
+
