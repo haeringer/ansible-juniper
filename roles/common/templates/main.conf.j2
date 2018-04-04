@@ -1,23 +1,27 @@
-#jinja2:lstrip_blocks: True
 {# This config is common to all Junos device types. For it to be generated the 'common' role must be included in the platform specific play file. #}
 system {
+    host-name {{ inventory_hostname }};
     time-zone {{ time_zone }};
     no-redirects;
     authentication-order [ tacplus password ];
     root-authentication {
-        encrypted-password "$1$rZSaOfdu$WkjrZFtNzv4rqemuUgfXL0"; ## SECRET-DATA
+        encrypted-password "{{ root_password }}"; ## SECRET-DATA
     }
     name-server {
-    {% for name_server in name_servers %}
+{% for name_server in name_servers %}
         {{ name_server }};
-    {% endfor %}
+{% endfor %}
     }
     tacplus-server {
-    {% for tacacs_server in tacacs_servers %}
+{% for tacacs_server in tacacs_servers %}
         {{ tacacs_server.ip }} { 
+            port 49;
             secret "{{ tacacs_server.secret }}";
+            timeout 10;
+            single-connection;
+            source-address {{ host.mgmt.ipv4_addr }}
         }
-    {% endfor %}
+{% endfor %}
     }
     services {
         ssh {
@@ -73,12 +77,15 @@ system {
         }
     }
     ntp {
-        {% for ntp_server in ntp_servers %}
+{% for ntp_server in ntp_servers %}
         server {{ ntp_server }};
-        {% endfor %}
+{% endfor %}
     }
 }
+{% block interfaces %}{% endblock %}
 snmp {
+    description "{{ inventory_hostname }}";
+    location {{ host.snmp.location }};
     contact "{{ snmp_contact }}";
     community {{ snmp_community }} {
         authorization read-only;
@@ -96,9 +103,13 @@ snmp {
             configuration;
         }
         targets {
-        {% for snmp_server in snmp_servers %}
+{% for snmp_server in snmp_servers %}
             {{ snmp_server }};
-        {% endfor %}
+{% endfor %}
         }
     }
 }
+{% block routing_options %}{% endblock %}
+{% block protocols %}{% endblock %}
+{% block policy_options %}{% endblock %}
+{% block etc %}{% endblock %}

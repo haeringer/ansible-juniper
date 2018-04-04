@@ -1,8 +1,14 @@
-# This task merges all the configuration fragments into one file
-# In this example it merges the common.conf.part and main.conf.part
-# into the junos.conf file.
-# If merging the files results in a new file being created then a handler
+# This task merges all the configuration fragments into one file.
+# If assembling the files results in a new file being created then a handler
 # is triggered to push the config onto the device.
+
+# Hinweis: Derzeit wird vom assemble-Modul nichts gemerged, da das Mergen
+# der common- und device-specific configs durch das Template Inheritance-
+# Feature der Jinja2 engine erledigt wird. Dadurch befindet sich im {{ build_dir }}
+# bereits die zusammengesetzte config als eine einzelne, komplette Datei.
+# Das assemble-Modul wird trotzdem beibehalten, um nur bei Aenderungen an den configs
+# die finale {{ junos_conf }} zu erstellen (Idempotenz).
+
 
 - name: Build configuration
   hosts: all
@@ -11,17 +17,18 @@
 
     - name: Assembling configuration templates
       assemble: src={{ build_dir }} dest={{ junos_conf }}
-      # This notify triggers the handler. It looks for a handler with this name
+#     # This notify triggers the handler. It looks for a handler with this name
       notify:
-        - Pushing config ... please wait
+        - Push config to device...
 
 # This handler (i.e. a task triggered by a notify) uses the junos_config 
 # module to apply the configuration to the device:
 
   handlers:
-    - name: Pushing config ... please wait
+    - name: Push config to device...
       debug:
-        msg: Test (config wird noch nicht gepusht)
+        msg: TEST - config wird noch nicht gepusht
 #     junos_config:
 #       src: "{{ junos_conf }}"
 #action: overwrite
+
