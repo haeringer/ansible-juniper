@@ -16,7 +16,8 @@
       junos_facts:
       register: junosfacts
     - name: junos_facts Output...
-      debug: var=junosfacts['ansible_facts']['ansible_net_version']
+      debug:
+        msg: "Junos version: {{ ansible_net_version }}"
     
     - name: Retrieve Junos version via juniper_junos_command module
       juniper_junos_command:
@@ -24,13 +25,14 @@
           - "show version"
       register: juniperjunoscommand
     - name: juniper_junos_command Output...
-      debug: var=juniperjunoscommand
+      debug: 
+        var: juniperjunoscommand.stdout_lines[5]
 
     - name: Retrieve Junos version via juniper_junos_rpc module
       juniper_junos_rpc:
         rpcs:
           - "get-software-information"
-#       return_output: false
       register: juniperjunosrpc
     - name: juniper_junos_rpc Output...
-      debug: var=juniperjunosrpc
+      debug:
+        msg: "{{ juniperjunosrpc['parsed_output']['multi-routing-engine-results']['multi-routing-engine-item']['software-information']['junos-version'] }}"
