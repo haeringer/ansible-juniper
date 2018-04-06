@@ -10,25 +10,28 @@
 # die finale {{ junos_conf }} zu erstellen (Idempotenz).
 
 
-- name: Build configuration
+- name: Build + Push configuration
   hosts: all
 
   tasks:
 
-    - name: Assembling configuration templates
+    - name: Assemble configuration templates
       assemble: src={{ build_dir }} dest={{ junos_conf }}
-#     # This notify triggers the handler. It looks for a handler with this name
+      # Trigger handler with junos_config only if new config has been generated
       notify:
         - Push config to device...
 
-# This handler (i.e. a task triggered by a notify) uses the junos_config 
-# module to apply the configuration to the device:
-
+  # Use the junos_config module to push + commit the config. Default behaviour is
+  # to merge the config with the existing one
   handlers:
     - name: Push config to device...
       debug:
         msg: TEST - config wird noch nicht gepusht
 #     junos_config:
 #       src: "{{ junos_conf }}"
-#action: overwrite
+#     register: response
+#
+#   - name: junos_config Output:
+#     debug:
+#       var: response
 
