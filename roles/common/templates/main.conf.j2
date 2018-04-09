@@ -8,15 +8,15 @@ system {
         encrypted-password "{{ root_password }}"; ## SECRET-DATA
     }
     name-server {
-{% for name_server in name_servers %}
-        {{ name_server }};
+{% for namesrv in name_servers %}
+        {{ namesrv }};
 {% endfor %}
     }
     tacplus-server {
-{% for tacacs_server in tacacs_servers %}
-        {{ tacacs_server.ip }} { 
+{% for tacsrv in tacacs_servers %}
+        {{ tacsrv.ip }} { 
             port 49;
-            secret "{{ tacacs_server.secret }}";
+            secret "{{ tacsrv.secret }}";
             timeout 10;
             single-connection;
             source-address {{ host.mgmt.ipv4_addr }}
@@ -37,32 +37,19 @@ system {
         class rancid {
             permissions [ access admin firewall flow-tap interface network routing secret security snmp system trace view ];
         }
-        user exampleorg {
-            uid 2000;
-            class super-user;
+{% for usr in users %}
+        user {{ usr.name }} {
+            uid {{ usr.uid }};
+            class {{ usr.class }};
             authentication {
-                encrypted-password "$1$Cfleyry8$.344Wb06pWKZpjIbfH53P1"; ## SECRET-DATA
+			{% if usr.passwd %}
+			    encrypted-password "{{ usr.passwd }}"; ## SECRET-DATA
+			{% elif usr.ssh_key %}
+				ssh-rsa "{{ usr.ssh_key }}"; ## SECRET-DATA
+            {% endif %}
             }
         }
-        user rancid {
-            uid 2001;
-            class rancid;
-            authentication {
-                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAlg0AXW3n/6oPKUWJgJSOdyLv4J9DQhEFMrfy627RcQvLZPLXQxy4XPcQWvTUDwYF/2A/XeBzKxlC7LYhTgbcj6FwvI1Udofhe8s4EjAG/pdH1z2VfwHlfzC3hI8jvS187p1cTc3IT2tkud2qEk9JWYPQixRPL3GkRdIriIKK7DD5KoWTyGOnnjqzcW/U7RzdI8LU348o9kPumarpRgCVEKClhGnfveZjlt0rCcsONrCPs+e5v1OE79xze58HxU7GtfhH7AJaseb+9/EQIYI+TJIQgrTIaJd+bik1Nc+DrSIkW8YUcOesNYomjXAtiSuQj0J0AgBhkcXBwiA1COJKkQ=="; ## SECRET-DATA
-            }
-        }
-        user remote {
-            uid 2002;
-            class read-only;
-        }
-        user sdavid {
-            full-name "Steffen David";
-            uid 2004;
-            class super-user;
-            authentication {
-                encrypted-password "$1$w5Aho4H3$zEVvMRiCwiQKqzr3A.VGL1"; ## SECRET-DATA
-            }
-        }
+{% endfor %}
     }
     syslog {
         user * {
@@ -77,8 +64,8 @@ system {
         }
     }
     ntp {
-{% for ntp_server in ntp_servers %}
-        server {{ ntp_server }};
+{% for ntpsrv in ntp_servers %}
+        server {{ ntpsrv }};
 {% endfor %}
     }
 }
@@ -103,8 +90,8 @@ snmp {
             configuration;
         }
         targets {
-{% for snmp_server in snmp_servers %}
-            {{ snmp_server }};
+{% for snmpsrv in snmp_servers %}
+            {{ snmpsrv }};
 {% endfor %}
         }
     }
