@@ -42,10 +42,10 @@ system {
             uid {{ usr.uid }};
             class {{ usr.class }};
             authentication {
-			{% if usr.passwd %}
-			    encrypted-password "{{ usr.passwd }}"; ## SECRET-DATA
-			{% elif usr.ssh_key %}
-				ssh-rsa "{{ usr.ssh_key }}"; ## SECRET-DATA
+            {% if usr.passwd %}
+                encrypted-password "{{ usr.passwd }}"; ## SECRET-DATA
+            {% elif usr.ssh_key %}
+                ssh-rsa "{{ usr.ssh_key }}"; ## SECRET-DATA
             {% endif %}
             }
         }
