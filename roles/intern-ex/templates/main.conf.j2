@@ -57,10 +57,10 @@ interfaces {
         unit {{ host.mgmt.vlan }} {
             description "{{ inventory_hostname }}";
             family inet {
-                address {{ host.mgmt.v4_addr }}/{{ host.mgmt.v4_mask }};
+                address {{ host.mgmt.v4_addr }}/24;
             }
             family inet6 {
-                address {{ host.mgmt.v6_addr }}/{{ host.mgmt.v6_mask }};
+                address {{ host.mgmt.v6_addr }}/64;
             }
         }
     }
