@@ -1,7 +1,10 @@
-{# This config is common to all Junos device types. For it to be generated the 'common' role must be included in the platform specific play file. #}
+{# This config is common to all Junos device types. For it to be generated 
+   the 'common' role must be included in the platform specific play file. 
+#}
 {% block groups %}{% endblock %}
 system {
     host-name {{ inventory_hostname }};
+    domain-name {{ domain_name }};
     time-zone {{ time_zone }};
     no-redirects;
     authentication-order [ tacplus password ];
@@ -17,10 +20,30 @@ system {
     {% for tacsrv in tacacs_servers %}
         {{ tacsrv.ip }} { 
             port 49;
-            secret "{{ tacsrv.secret }}";
+            secret "{{ tacsrv.secret }}"; ## SECRET-DATA
             timeout 10;
             single-connection;
-            source-address {{ host.mgmt.ipv4_addr }}
+            source-address {{ host.mgmt.v4_addr }};
+        }
+    {% endfor %}
+    }
+    login {
+        class rancid {
+            permissions [ access admin firewall flow-tap interface network routing secret security snmp system trace view ];
+        }
+    {% for usr in users %}
+        user {{ usr.name }} {
+            uid {{ usr.uid }};
+            class {{ usr.class }};
+            {% if usr.passwd is defined %}
+            authentication {
+                encrypted-password "{{ usr.passwd }}"; ## SECRET-DATA
+            }
+            {% elif usr.ssh_key is defined %}
+            authentication {
+                ssh-rsa "{{ usr.ssh_key }}"; ## SECRET-DATA
+            }
+            {% endif %}
         }
     {% endfor %}
     }
@@ -33,24 +56,6 @@ system {
         netconf {
             ssh;
         }
-    }
-    login {
-        class rancid {
-            permissions [ access admin firewall flow-tap interface network routing secret security snmp system trace view ];
-        }
-    {% for usr in users %}
-        user {{ usr.name }} {
-            uid {{ usr.uid }};
-            class {{ usr.class }};
-            authentication {
-            {% if usr.passwd %}
-                encrypted-password "{{ usr.passwd }}"; ## SECRET-DATA
-            {% elif usr.ssh_key %}
-                ssh-rsa "{{ usr.ssh_key }}"; ## SECRET-DATA
-            {% endif %}
-            }
-        }
-    {% endfor %}
     }
     syslog {
         user * {
@@ -71,7 +76,7 @@ system {
     }
 }
 {% block chassis %}{% endblock %}
-{% block interfaces %}{% endblock %}
+{#{% block interfaces %}{% endblock %}#}
 snmp {
     description "{{ inventory_hostname }}";
     location {{ host.snmp.location }};
