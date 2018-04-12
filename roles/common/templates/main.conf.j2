@@ -76,7 +76,7 @@ system {
     }
 }
 {% block chassis %}{% endblock %}
-{#{% block interfaces %}{% endblock %}#}
+{% block interfaces %}{% endblock %}
 snmp {
     description "{{ inventory_hostname }}";
     location {{ host.snmp.location }};

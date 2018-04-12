@@ -14,36 +14,48 @@ chassis {
 {% endblock %}
 {% block interfaces %}
 interfaces {
-    interface-range uplinks {
-        member-range ge-0/1/0 to ge-0/1/1;
+{% for ifrange in host.if_ranges %}
+    interface-range {{ ifrange.name }} {
+    {% if ifrange.member_range is defined %}{% for rng in ifrange.member_range %}
+        member-range {{ rng }};
+    {% endfor %}{% endif %}
+    {% if ifrange.member is defined %}{% for intf in ifrange.member %}
+        member {{ intf }};
+    {% endfor %}{% endif %}
         unit 0 {
             family ethernet-switching {
-                port-mode trunk;
+            {% if ifrange.mode is defined %}
+                port-mode {{ ifrange.mode }};
+            {% endif %}
+            {% if ifrange.vlan is defined %}
                 vlan {
-                    members all;
+                    members {% if ifrange.vlan|length < 2 %}{{ ifrange.vlan[0] }};
+                    {% else %}[ {% for vln in ifrange.vlan %}{{ vln }} {% endfor %}];
+                    {% endif %}
+                }
+            {% endif %}
+            }
+        }
+    }
+{% endfor %}
+{% for iface in host.interfaces %}
+    {{ iface.name }} {
+    {% if iface.desc is defined %}
+        description "{{ iface.desc }}";
+    {% endif %}
+    {% if iface.vlan is defined %}
+        unit 0 {
+            family ethernet-switching {
+                vlan {
+                    members {% if iface.vlan|length < 2 %}{{ iface.vlan[0] }};
+                    {% else %}[ {% for vln in iface.vlan %}{{ vln }} {% endfor %}];
+                    {% endif %}
                 }
             }
         }
+    {% endif %}
     }
-    interface-range xlinks {
-        member-range ge-0/1/2 to ge-0/1/3;
-        unit 0 {
-            family ethernet-switching {
-                port-mode trunk;
-                vlan {
-                    members all;
-                }
-            }
-        }
-    }
-    interface-range access-ports {
-        member-range ge-0/0/0 to ge-0/0/47;
-        unit 0 {
-            family ethernet-switching {
-                port-mode access;
-            }
-        }
-    }
+{% endfor %}
     me0 {
         unit 0 {
             description "Emergency OOB Mgmt";
@@ -55,7 +67,7 @@ interfaces {
     }
     vlan {
         unit {{ host.mgmt.vlan }} {
-            description "{{ inventory_hostname }}";
+            description "{{ inventory_hostname }} Mgmt";
             family inet {
                 address {{ host.mgmt.v4_addr }}/24;
             }
