@@ -97,7 +97,7 @@ protocols {
     }
     dot1x {
         authenticator {
-            authentication-profile-name {{ radius.profile }};
+            authentication-profile-name PNAC1;
             interface {
                 access-dot1x {
                     supplicant multiple;
@@ -152,10 +152,10 @@ protocols {
 access {
     radius-server {
     {% for radiussrv in radius_servers %}
-        {{ radiussrv }} secret "{{ radius.secret }}"; ## SECRET-DATA
+        {{ radiussrv }} secret "{{ radius_secret }}"; ## SECRET-DATA
     {% endfor %}
     }
-    profile {{ radius.profile }} {
+    profile PNAC1 {
         authentication-order radius;
         radius {
             authentication-server {% if radius_servers|length < 2 %}{{ radius_servers[0] }};

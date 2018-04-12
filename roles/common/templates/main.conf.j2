@@ -78,7 +78,6 @@ system {
 {% block chassis %}{% endblock %}
 {% block interfaces %}{% endblock %}
 snmp {
-    description "{{ inventory_hostname }}";
     location {{ host.snmp.location }};
     contact "{{ snmp_contact }}";
     community {{ snmp_community }} {
