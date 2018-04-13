@@ -12,6 +12,8 @@
 
 - name: Build + Push configuration
   hosts: all
+  roles:
+    - Juniper.junos
 
   tasks:
 
@@ -25,13 +27,15 @@
   # to merge the config with the existing one
   handlers:
     - name: Push config to device...
-      debug:
-        msg: TEST - config wird noch nicht gepusht
-#     junos_config:
-#       src: "{{ junos_conf }}"
-#     register: response
-#
-#   - name: junos_config Output:
 #     debug:
-#       var: response
+#       msg: TEST - config wird nicht gepusht
+      juniper_junos_config:
+        src: "{{ junos_conf }}"
+        load: 'update'
+#       confirm: 3
+      register: response
+ 
+    - name: junos_config Output...
+      debug:
+        var: response
 
