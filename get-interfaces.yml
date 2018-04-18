@@ -1,0 +1,21 @@
+---
+- name: Get Device Facts
+  hosts: all
+  vars:
+    - ansible_connection: network_cli
+  roles:
+    - Juniper.junos
+
+  tasks:
+
+    - name: Retrieve interface status
+      juniper_junos_command:
+        commands:
+          - "show interfaces descriptions"
+          - "show interfaces terse"
+      register: response
+
+    - name: Print device output
+      debug:
+        var: item.stdout_lines
+      with_items: "{{ response.results }}" 

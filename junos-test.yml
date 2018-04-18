@@ -35,4 +35,5 @@
       register: juniperjunosrpc
     - name: juniper_junos_rpc Output...
       debug:
-        msg: "{{ juniperjunosrpc['parsed_output']['multi-routing-engine-results']['multi-routing-engine-item']['software-information']['junos-version'] }}"
+        var: juniperjunosrpc
+        #msg: "{{ juniperjunosrpc['parsed_output']['multi-routing-engine-results']['multi-routing-engine-item']['software-information']['junos-version'] }}"

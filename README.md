@@ -21,9 +21,17 @@ Simpler NETCONF-Verbindungstest und Abfrage der Junos-Version über unterschiedl
     -l     Ziel-Devices in hosts-Datei auf Gruppe limiteren, z.B. -l "lab-ex"
 
 
-## Playbook zur Konfiguration der Infrastruktur
+## Playbook zur Interface-Abfrage
 
-Playbook kann derzeit noch ohne Auswirkungen auf Produktivsysteme ausgeführt werden ('junos_config'-Modul auskommentiert). Es erfolgt jedoch bereits ein lokaler Build der config, so dass dieser Teil der Automation gefahrenlos getestet werden kann.
+Simples Playbook zur Abfrage des Interface-Status (führt ```show interfaces terse```+ ```descriptions``` via CLI aus)
+
+	ansible-playbook -k get-interfaces.yml -l 'ia5.b0-noc'
+
+
+## Playbook zur Automation der Infrastruktur
+
+Playbook konfiguriert alle Systeme via juniper_junos_config Modul. Greift per default auf Inventory ```hosts_production``` zurück, wo alle noch nicht automatisierten Systeme auskommentiert sind. Die Datei ```hosts_production``` NICHT unbedacht ändern, sonst können Konfigurationen von Produktivsystemen überschrieben werden.
 
     ansible-playbook -k main.yml
+
 
