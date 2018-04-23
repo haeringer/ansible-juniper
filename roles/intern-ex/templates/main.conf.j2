@@ -176,7 +176,7 @@ ethernet-switching-options {
 {% endblock %}
 {% block vlans %}
 vlans {
-{% for vln in vlans %}
+{% for vln in (area.vlans|list + multiple.vlans|list)|sort %}
     {{ vln.name }} {
         vlan-id {{ vln.id }};
         {% if vln.id == host.mgmt.vlan %}
