@@ -4,6 +4,6 @@ ansible_connection: netconf
 ansible_network_os: junos
 
 # Temporary directories for building the device configs
-build_dir: /tmp/build/{{ inventory_hostname }}/pre-assemble
-junos_conf: /tmp/build/{{ inventory_hostname }}/junos.conf
+build_dir: ~/build/{{ inventory_hostname }}/pre-assemble
+junos_conf: ~/build/{{ inventory_hostname }}/junos.conf
 
