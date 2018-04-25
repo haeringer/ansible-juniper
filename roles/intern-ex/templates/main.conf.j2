@@ -22,7 +22,7 @@ interfaces {
     {% if ifrange.member is defined %}{% for intf in ifrange.member %}
         member {{ intf }};
     {% endfor %}{% endif %}
-    {% if (ifrange.mode is defined or ifrange.vlan is defined) %}
+    {% if (ifrange.mode is defined or ifrange.vlan is defined or ifrange.vlans is defined) %}
         unit 0 {
             family ethernet-switching {
             {% if ifrange.mode is defined %}
@@ -30,10 +30,15 @@ interfaces {
             {% endif %}
             {% if ifrange.vlan is defined %}
                 vlan {
-                    members {% if ifrange.vlan|length < 2 %}{{ ifrange.vlan[0] }};
-                    {% else %}[ {% for vln in ifrange.vlan %}{{ vln }} {% endfor %}];
-                    {% endif %}
+                    members {{ ifrange.vlan }};
                 }
+            {% elif ifrange.vlans is defined %}
+                vlan {
+                    members [ {% for vln in ifrange.vlans %}{{ vln }} {% endfor %}];
+                }
+            {% endif %}
+            {% if ifrange.native is defined %}
+                native-vlan-id {{ ifrange.native }};
             {% endif %}
             }
         }
@@ -45,14 +50,24 @@ interfaces {
     {% if iface.desc is defined %}
         description "{{ iface.desc }}";
     {% endif %}
-    {% if iface.vlan is defined %}
+    {% if iface.mtu is defined %}
+        mtu {{ iface.mtu }};
+    {% endif %}
+    {% if (iface.vlan is defined or iface.vlans is defined) %}
         unit 0 {
             family ethernet-switching {
+            {% if iface.vlan is defined %}
                 vlan {
-                    members {% if iface.vlan|length < 2 %}{{ iface.vlan[0] }};
-                    {% else %}[ {% for vln in iface.vlan %}{{ vln }} {% endfor %}];
-                    {% endif %}
+                    members {{ iface.vlan }};
                 }
+            {% elif iface.vlans is defined %}
+                vlan {
+                    members [ {% for vln in iface.vlans %}{{ vln }} {% endfor %}];
+                }
+            {% endif %}
+            {% if iface.native is defined %}
+                native-vlan-id {{ iface.native }};
+            {% endif %}
             }
         }
     {% endif %}
