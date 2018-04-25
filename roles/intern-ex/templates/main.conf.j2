@@ -16,12 +16,18 @@ chassis {
 interfaces {
 {% for ifrange in host.if_ranges %}
     interface-range {{ ifrange.name }} {
-    {% if ifrange.member_range is defined %}{% for rng in ifrange.member_range %}
+    {% if ifrange.member_ranges is defined %}{% for rng in ifrange.member_ranges %}
         member-range {{ rng }};
     {% endfor %}{% endif %}
-    {% if ifrange.member is defined %}{% for intf in ifrange.member %}
+    {% if ifrange.members is defined %}{% for intf in ifrange.members %}
         member {{ intf }};
     {% endfor %}{% endif %}
+    {% if ifrange.member_range is defined %}
+        member-range {{ ifrange.member_range }};
+    {% endif %}
+    {% if ifrange.member is defined %}
+        member {{ ifrange.member }};
+    {% endif %}
     {% if (ifrange.mode is defined or ifrange.vlan is defined or ifrange.vlans is defined) %}
         unit 0 {
             family ethernet-switching {
