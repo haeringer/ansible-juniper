@@ -99,7 +99,7 @@ interfaces {
 {% endfor %}
     me0 {
         unit 0 {
-            description "Emergency OOB Mgmt";
+            description "{{ inventory_hostname }} local OOB Mgmt";
             family inet {
                 address 169.254.1.1/16;
             }
@@ -196,7 +196,6 @@ protocols {
     }
 }
 {% endblock %}
-{% if host.dot1x == true %}
 {% block access %}{% if host.dot1x == true %}
 access {
     radius-server {
@@ -214,7 +213,6 @@ access {
     }
 }
 {% endif %}{% endblock %}
-{% endif %}
 {% block ethernet_switching_options %}
 ethernet-switching-options {
     storm-control {
