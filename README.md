@@ -8,13 +8,7 @@ Außerdem Juniper Ansible Galaxy Role inkl. Abhängigkeiten:
     ansible-galaxy install Juniper.junos
 
 
-## Test-Playbook
-
-Simpler NETCONF-Verbindungstest und Abfrage der Junos-Version über unterschiedliche Module
-
-    ansible-playbook -u harry -k junos-test.yml
-
-#### Optionen
+#### Playbook Optionen
 
     -u     eigener Username (Tacacs-user in unserem Fall). Nicht nötig, falls dieser dem lokalen User entspricht
     -k     Aufforderung zur Passworteingabe (ansonsten wird SSH-Key verwendet)
@@ -23,14 +17,21 @@ Simpler NETCONF-Verbindungstest und Abfrage der Junos-Version über unterschiedl
 
 ## Playbook zur Interface-Abfrage
 
-Simples Playbook zur Abfrage des Interface-Status (führt ```show interfaces terse```+ ```descriptions``` via CLI aus)
+Abfrage des Interface-Status (führt ```show interfaces terse```+ ```descriptions``` via CLI aus), um z.B. freie Interfaces zu identifizieren
 
 	ansible-playbook -k get-interfaces.yml -l 'ia5.b0-noc'
 
 
+## Playbook für 'show | compare'
+
+Konfigurationsänderungen können mit diesem Playbook verifiziert werden, ohne dass die Konfiguration committed wird
+
+	ansible-playbook -k compare.yml -l 'ia5.b0-noc'
+
+
 ## Playbook zur Automation der Infrastruktur
 
-Playbook konfiguriert alle Systeme via juniper_junos_config Modul. Greift per default auf Inventory ```hosts_production``` zurück, wo alle noch nicht automatisierten Systeme auskommentiert sind. Die Datei ```hosts_production``` NICHT unbedacht ändern, sonst können Konfigurationen von Produktivsystemen überschrieben werden.
+Playbook konfiguriert alle Systeme via juniper_junos_config Modul. Greift per default auf Inventory ```hosts_production``` zurück, wo alle **noch nicht automatisierten Systeme auskommentiert** sind. Die Datei ```hosts_production``` NICHT unbedacht ändern, sonst können Konfigurationen von Produktivsystemen überschrieben werden.
 
     ansible-playbook -k main.yml
 
