@@ -7,4 +7,4 @@ ansible_network_os: junos
 build_dir: ~/ansible_tmp/{{ inventory_hostname }}/pre-assemble
 junos_conf: ~/ansible_tmp/{{ inventory_hostname }}/junos.conf
 compare_conf: ~/ansible_tmp/{{ inventory_hostname }}/compare.conf
-committed_conf: ~/ansible_tmp/{{ inventory_hostname }}/committed.conf
+committed_conf: ~/ansible_tmp/{{ inventory_hostname }}/

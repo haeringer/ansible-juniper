@@ -8,11 +8,12 @@
 
   tasks:
 
-    - name: Retrieve config + save at ~/ansible_tmp/{hostname}/{hostname}.conf
+    - name: Retrieve config + save at ~/ansible_tmp/{hostname}/{hostname}.xml
       juniper_junos_config:
         retrieve: "committed"
+        format: "xml"
         dest_dir: "{{ committed_conf }}"
-      register: response
+#      register: response
 #    - name: Print result
 #      debug:
 #        var: response.config_lines
