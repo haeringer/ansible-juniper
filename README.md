@@ -31,7 +31,7 @@ Konfigurationsänderungen können mit diesem Playbook verifiziert werden, ohne d
 
 ## Playbook zur Automation der Infrastruktur
 
-Playbook konfiguriert alle Systeme via juniper_junos_config Modul. Greift per default auf Inventory ```hosts_production``` zurück, wo alle **noch nicht automatisierten Systeme auskommentiert** sind. Die Datei ```hosts_production``` NICHT unbedacht ändern, sonst können Konfigurationen von Produktivsystemen überschrieben werden.
+Playbook konfiguriert alle Systeme via juniper_junos_config Modul. Wird bei Pushes in *master* automatisch ausgeführt. Greift per default auf Inventory ```hosts_production``` zurück, wo alle **noch nicht automatisierten Systeme auskommentiert** sind. Die Datei ```hosts_production``` NICHT unbedacht ändern, sonst können Konfigurationen von Produktivsystemen überschrieben werden.
 
     ansible-playbook -k main.yml
 
