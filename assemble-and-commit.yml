@@ -32,6 +32,7 @@
       juniper_junos_config:
         src: "{{ junos_conf }}"
         load: 'update'
+        timeout: '60'
 #       confirm: 3
       register: response
  
