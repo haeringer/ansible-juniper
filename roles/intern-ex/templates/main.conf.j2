@@ -14,16 +14,21 @@ chassis {
 {% endblock %}
 {% block interfaces %}
 interfaces {
-{% for ifrange in host.if_ranges %}
-    interface-range {{ ifrange.name }} {
-    {% if ifrange.member_ranges is defined %}{% for rng in ifrange.member_ranges %}
+{% for _ifrange_ in host.if_ranges|sort %}
+    {% set ifrange = host.if_ranges[_ifrange_] %}
+    interface-range {{ _ifrange_ }} {
+    {% if ifrange.member_ranges is defined %}
+        {% for rng in ifrange.member_ranges %}
         member-range {{ rng }};
-    {% endfor %}{% endif %}
-    {% if ifrange.members is defined %}{% for intf in ifrange.members %}
-        member {{ intf }};
-    {% endfor %}{% endif %}
+        {% endfor %}
+    {% endif %}
     {% if ifrange.member_range is defined %}
         member-range {{ ifrange.member_range }};
+    {% endif %}
+    {% if ifrange.members is defined %}
+        {% for intf in ifrange.members %}
+        member {{ intf }};
+        {% endfor %}
     {% endif %}
     {% if ifrange.member is defined %}
         member {{ ifrange.member }};
@@ -51,8 +56,9 @@ interfaces {
     {% endif %}
     }
 {% endfor %}
-{% for iface in host.interfaces %}
-    {{ iface.name }} {
+{% for _iface in host.interfaces %}
+    {% set iface = host.interfaces[_iface] %}
+    {{ _iface }} {
     {% if iface.desc is defined %}
         description "{{ iface.desc }}";
     {% endif %}
@@ -155,11 +161,14 @@ protocols {
         configuration-name interes-netz-2015;
         revision-level 1;
         bridge-priority {{ host.mstp.bridge_prio }};
-    {% for iface in host.interfaces %}{% if (iface.mstp is defined and iface.mstp == 'disable') %}
-        interface {{ iface.name }}.0 {
+    {% for _iface in host.interfaces %}
+        {% set iface = host.interfaces[_iface] %}
+        {% if (iface.mstp is defined and iface.mstp == 'disable') %}
+        interface {{ _iface }}.0 {
             disable;
         }
-    {% endif %}{% endfor %}
+        {% endif %}
+    {% endfor %}
         interface access-ports {
             edge;
         }
@@ -218,13 +227,16 @@ ethernet-switching-options {
     storm-control {
         interface all;
     }
-    {% for iface in host.interfaces %}{% if (iface.mstp is defined and iface.mstp == 'disable') %}
+{% for _iface in host.interfaces %}
+    {% set iface = host.interfaces[_iface] %}
+    {% if (iface.mstp is defined and iface.mstp == 'disable') %}
     bpdu-block {
-        interface {{ iface.name }}.0 {
+        interface {{ _iface }}.0 {
             drop;
         }
     }
-    {% endif %}{% endfor %}
+    {% endif %}
+{% endfor %}
 }
 {% endblock %}
 {% block vlans %}
