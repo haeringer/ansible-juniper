@@ -8,9 +8,6 @@
 
   tasks:
 
-    - name: Assemble configuration templates
-      assemble: src={{ build_dir }} dest={{ junos_conf }}
-
     - name: Push, check and compare...
       juniper_junos_config:
         src: '{{ junos_conf }}'

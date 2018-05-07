@@ -1,14 +1,6 @@
-# This task merges all the configuration fragments into one file.
-# If assembling the files results in a new file being created then a handler
-# is triggered to push the config onto the device.
-
-# Hinweis: Derzeit wird vom assemble-Modul nichts gemerged, da das Mergen
-# der common- und device-specific configs durch das Template Inheritance-
-# Feature der Jinja2 engine erledigt wird. Dadurch befindet sich im {{ build_dir }}
-# bereits die zusammengesetzte config als eine einzelne, komplette Datei.
-# Das assemble-Modul wird trotzdem beibehalten, um nur bei Aenderungen an den configs
-# die finale {{ junos_conf }} zu erstellen (Idempotenz).
-
+# Task erstellt config-build, pusht die config auf das device und fuehrt 
+# einen commit durch. Standardmaessig werden einzelne Hierarchie-Ebenen 
+# der Junos-config ersetzt (Parameter load: 'update').
 
 - name: Build + Push configuration
   hosts: all
@@ -17,26 +9,14 @@
 
   tasks:
 
-    - name: Assemble configuration templates
-      assemble: src={{ build_dir }} dest={{ junos_conf }}
-      # Trigger handler with junos_config only if new config has been generated
-      notify:
-        - Push config to device...
-
-  # Use the junos_config module to push + commit the config. Default behaviour is
-  # to merge the config with the existing one
-  handlers:
-    - name: Push config to device...
-#     debug:
-#       msg: TEST - config wird nicht gepusht
+    - name: Push config to device and commit
       juniper_junos_config:
         src: "{{ junos_conf }}"
         load: 'update'
         timeout: '60'
 #       confirm: 3
       register: response
- 
-    - name: junos_config Output...
+    - name: junos_config output...
       debug:
         var: response
 

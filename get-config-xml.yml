@@ -12,7 +12,7 @@
       juniper_junos_config:
         retrieve: "committed"
         format: "xml"
-        dest_dir: "{{ committed_conf }}"
+        dest_dir: "{{ build_dir }}"
 #      register: response
 #    - name: Print result
 #      debug:
