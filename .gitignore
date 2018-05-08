@@ -1,4 +1,3 @@
-group_vars/all/credentials.yml
 ansible.log
 *.swp
 .DS_Store
