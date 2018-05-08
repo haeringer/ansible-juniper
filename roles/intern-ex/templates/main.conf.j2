@@ -41,11 +41,11 @@ interfaces {
             {% endif %}
             {% if ifrange.vlan is defined %}
                 vlan {
-                    members {{ ifrange.vlan }};
+                    members {% if ifrange.vlan == 'all' %}all{% else %}{{ vlans[ifrange.vlan] }}{% endif %};
                 }
             {% elif ifrange.vlans is defined %}
                 vlan {
-                    members [ {% for vln in ifrange.vlans %}{{ vln }} {% endfor %}];
+                    members [ {% for vln in ifrange.vlans %}{{ vlans[vln] }} {% endfor %}];
                 }
             {% endif %}
             {% if ifrange.native is defined %}
@@ -88,11 +88,11 @@ interfaces {
             {% endif %}
             {% if iface.vlan is defined %}
                 vlan {
-                    members {{ iface.vlan }};
+                    members {% if iface.vlan == 'all' %}all{% else %}{{ vlans[iface.vlan] }}{% endif %};
                 }
             {% elif iface.vlans is defined %}
                 vlan {
-                    members [ {% for vln in iface.vlans %}{{ vln }} {% endfor %}];
+                    members [ {% for vln in iface.vlans %}{{ vlans[vln] }} {% endfor %}];
                 }
             {% endif %}
             {% if iface.native is defined %}
@@ -241,11 +241,12 @@ ethernet-switching-options {
 {% endblock %}
 {% block vlans %}
 vlans {
-{% for vln in (area.vlans|list + multiple.vlans|list)|sort %}
-    {{ vln.name }} {
-        vlan-id {{ vln.id }};
-        {% if vln.id == host.mgmt.vlan %}
-        l3-interface vlan.{{ vln.id }};
+{% for _vln in vlans|sort %}
+    {% set vln = vlans[_vln] %}
+    {{ vln }} {
+        vlan-id {{ _vln }};
+        {% if _vln == host.mgmt.vlan %}
+        l3-interface vlan.{{ _vln }};
         {% endif %}
     }
 {% endfor %}
