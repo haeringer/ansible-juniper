@@ -1,14 +1,14 @@
 # Task erstellt einen config-build, fuehrt aber anstelle eines commits ein
 # commit check und anschließenden diff durch
 
-- name: Build, check and compare configuration
+- name: Build & compare Junos configuration
   hosts: all
   roles:
     - Juniper.junos
 
   tasks:
 
-    - name: Push, check and compare...
+    - name: Push, commit check and compare...
       juniper_junos_config:
         src: '{{ junos_conf }}'
         load: 'update'
@@ -17,6 +17,12 @@
         diff: 'yes'
         diffs_file: '{{ compare_conf }}'
       register: response
-    - name: 'Diff output:'
+
+    - name: 'Output diff if changes are present, else skip:'
       debug:
         var: response.diff_lines
+      when: response.diff_lines is defined
+
+    - name: 'Message from juniper_junos_config:'
+      debug:
+        var: response.msg

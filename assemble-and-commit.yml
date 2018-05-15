@@ -16,7 +16,13 @@
         timeout: '60'
 #       confirm: 3
       register: response
-    - name: junos_config output...
-      debug:
-        var: response
 
+    - name: 'Output diff if changes are present, else skip:'
+      debug:
+        var: response.diff_lines
+      when: response.diff_lines is defined
+
+    - name: 'Message from juniper_junos_config:'
+      debug:
+        var: response.msg
+    
