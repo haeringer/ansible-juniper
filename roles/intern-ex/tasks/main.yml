@@ -1,5 +1,3 @@
 ---
 - name: Build configuration via Jinja2 template
-  template: >
-    src=main.conf.j2
-    dest={{ junos_conf }}
+  local_action: template src=main.conf.j2 dest={{ junos_conf }}

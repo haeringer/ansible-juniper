@@ -6,6 +6,7 @@
   hosts: all
   roles:
     - Juniper.junos
+  gather_facts: no
 
   tasks:
 
