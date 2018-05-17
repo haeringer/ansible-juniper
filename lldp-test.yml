@@ -1,0 +1,57 @@
+---
+- name: Get Device Facts
+  hosts: all
+  roles:
+    - Juniper.junos
+  gather_facts: no
+#  vars:
+#    var_path: bar 
+
+  tasks:
+
+    - name: Retrieve LLDP neighbor table
+      junos_get_table:
+        table: "LLDPNeighborTable"
+        file: "lldp.yml" 
+        host: "{{ inventory_hostname }}" 
+      register: neighbors
+
+    - name: Retrieve LLDP remote interfaces
+      juniper_junos_command:
+        commands:
+          - "show lldp neighbors interface {{ item['local_int'] }}"
+        format: xml
+      with_items: "{{ neighbors['resource'] }}"
+      register: response
+
+    - name: Print lldp interfaces
+      debug:
+        var: item.parsed_output['lldp-neighbors-information']['lldp-neighbor-information']['lldp-remote-port-id']
+      with_items: "{{ response.results }}"
+
+    - name: Configure interface description
+      juniper_junos_command:
+        commands:
+          - "show interface {{ item.parsed_output['lldp-neighbors-information']['lldp-neighbor-information']['lldp-local-interface'] }}"
+#          - set interfaces {{ item.parsed_output['lldp-neighbors-information']['lldp-neighbor-information']['lldp-local-interface'] }} description "{{ item.parsed_output['lldp-neighbors-information']['lldp-neighbor-information']['lldp-remote-system-name'] }} {{ item.parsed_output['lldp-neighbors-information']['lldp-neighbor-information']['lldp-remote-port-id'] }}"
+        load: 'merge'
+        commit: 'no'
+        check: 'yes'
+        diff: 'yes'
+      with_items: "{{ response.results }}"
+      register: output
+
+    - name: 'Output diff if changes are present, else skip:'
+      debug:
+        var: output.diff_lines
+      when: output.diff_lines is defined
+
+
+#   - name: SET INTERFACE DESCRIPTION
+#       junos_config:
+#       host: "{{ inventory_hostname }}"
+#       replace: true
+#       lines:
+#         - set interfaces {{ item['local_int'] }} description "{{ item['remote_sysname'] }} {{ item['remote_port_desc'] }}"
+#       comment: Changing interface descriptions
+#     with_items: "{{ neighbors['resource'] }}"
