@@ -12,7 +12,7 @@
     - name: Retrieve config + save at ~/ansible_tmp/{hostname}/{hostname}.config
       juniper_junos_config:
         retrieve: "committed"
-        dest_dir: "{{ build_dir }}"
+        dest_dir: "{{ base_dir }}"
       register: response
 #    - name: Print result
 #      debug:

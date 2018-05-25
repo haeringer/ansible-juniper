@@ -1,0 +1,20 @@
+#jinja2:lstrip_blocks: True
+{# role 'access' in Playbook einbauen, um diesen Teil der config zu generieren 
+#}
+{% if dot1x == true %}
+access {
+    radius-server {
+    {% for radiussrv in radius_servers %}
+        {{ radiussrv.ip }} secret "{{ radiussrv.secret }}"; ## SECRET-DATA
+    {% endfor %}
+    }
+    profile PNAC1 {
+        authentication-order radius;
+        radius {
+            authentication-server {% if radius_servers|length < 2 %}{{ radius_servers[0].ip }};
+            {% else %}[ {% for radiussrv in radius_servers %}{{ radiussrv.ip }} {% endfor %}];
+            {% endif %}
+        }
+    }
+}
+{% endif %}

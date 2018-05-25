@@ -1,6 +1,0 @@
----
-# task wird derzeit nicht benoetigt, da common config als 
-# Jinja2 parent template in device specific roles definiert
-
-#- name: Build common configuration using Jinja2 template
-#  local_action: template src=main.conf.j2 dest={{ build_dir }}/common.conf.part

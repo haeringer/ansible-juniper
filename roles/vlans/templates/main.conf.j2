@@ -1,0 +1,14 @@
+#jinja2:lstrip_blocks: True
+{# role 'vlans' in Playbook einbauen, um diesen Teil der config zu generieren 
+#}
+vlans {
+{% for _vln in vlans|sort %}
+    {% set vln = vlans[_vln] %}
+    {{ vln }} {
+        vlan-id {{ _vln }};
+        {% if _vln == mgmt.vlan %}
+        l3-interface vlan.{{ _vln }};
+        {% endif %}
+    }
+{% endfor %}
+}

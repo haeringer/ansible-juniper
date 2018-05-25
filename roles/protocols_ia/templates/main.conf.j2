@@ -1,0 +1,70 @@
+#jinja2:lstrip_blocks: True
+{# role 'protocols_ia' in Playbook einbauen, um diesen Teil der config zu generieren 
+#}
+protocols {
+    igmp-snooping {
+        vlan all;
+    }
+{% if dot1x == true %}
+    dot1x {
+        authenticator {
+            authentication-profile-name PNAC1;
+            interface {
+                access-dot1x {
+                    supplicant multiple;
+                    guest-vlan VL1900_Service-Support;
+                    server-reject-vlan VL1900_Service-Support;
+                    server-fail use-cache;
+                }
+            }
+        }
+    }
+{% endif %}
+    mstp {
+        configuration-name interes-netz-2015;
+        revision-level 1;
+        bridge-priority {{ mstp.bridge_prio }};
+    {% for _iface in interfaces %}
+        {% set iface = interfaces[_iface] %}
+        {% if (iface.mstp is defined and iface.mstp == 'disable') %}
+        interface {{ _iface }}.0 {
+            disable;
+        }
+        {% endif %}
+    {% endfor %}
+        interface access-ports {
+            edge;
+        }
+        interface uplinks {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+        interface xlinks {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+        msti 1 {
+            bridge-priority {{ mstp.bridge_prio }};
+            vlan 1300-2399;
+        }
+        msti 2 {
+            bridge-priority {{ mstp.bridge_prio }};
+            vlan 2400-3399;
+        }
+        msti 3 {
+            bridge-priority {{ mstp.bridge_prio }};
+            vlan 3400-4094;
+        }
+        bpdu-block-on-edge;
+    }
+    lldp {
+        port-id-subtype interface-name;
+        interface uplinks;
+        interface xlinks;
+    }
+    lldp-med {
+        interface access-ports;
+    }
+}

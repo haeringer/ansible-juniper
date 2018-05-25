@@ -1,5 +1,5 @@
 ---
-- name: Create build directories for hosts
+- name: CREATE BUILD DIRECTORIES FOR CONFIGURATION FILES
   hosts: all
   connection: local
   gather_facts: no

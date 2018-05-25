@@ -1,7 +1,6 @@
-{# This config is common to all Junos device types. For it to be generated 
-   the 'common' role must be included in the platform specific play file. 
+#jinja2:lstrip_blocks: True
+{# role 'system' in Playbook einbauen, um diesen Teil der config zu generieren 
 #}
-{% block groups %}{% endblock %}
 /* Config generiert durch Ansible */
 system {
     host-name {{ inventory_hostname }};
@@ -77,39 +76,3 @@ system {
     {% endfor %}
     }
 }
-{% block chassis %}{% endblock %}
-{% block interfaces %}{% endblock %}
-snmp {
-    location "{{ snmp.location }}";
-    contact "{{ snmp_contact }}";
-    community {{ snmp_community }} {
-        authorization read-only;
-    }
-    trap-group default {
-        categories {
-            authentication;
-            chassis;
-            link;
-            remote-operations;
-            routing;
-            startup;
-            rmon-alarm;
-            vrrp-events;
-            configuration;
-        }
-        targets {
-        {% for snmpsrv in snmp_servers %}
-            {{ snmpsrv }};
-        {% endfor %}
-        }
-    }
-}
-{% block routing_options %}{% endblock %}
-{% block protocols %}{% endblock %}
-{% block access %}{% endblock %}
-{% block ethernet_switching_options %}{% endblock %}
-{% block vlans %}{% endblock %}
-{% block policy_options %}{% endblock %}
-{% block firewall %}{% endblock %}
-{% block bridge_domains %}{% endblock %}
-{% block poe %}{% endblock %}
