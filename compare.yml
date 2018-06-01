@@ -2,4 +2,5 @@
 # This playbook will generate and apply configuration to all of the devices
 - import_playbook: _subpbook_cleanup.yml
 - import_playbook: _subpbook_intern-access.yml
+- import_playbook: _subpbook_intern-core.yml
 - import_playbook: _subpbook_assemble-compare.yml

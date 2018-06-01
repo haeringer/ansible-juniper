@@ -1,0 +1,23 @@
+---
+- name: GENERATE JUNOS CONFIGURATION PARTS
+  hosts: all
+  connection: local
+  gather_facts: no
+
+  # Ansible schaut in roles/<role name>/tasks/main.yaml und fuehrt die 
+  # dortigen Tasks aus.
+  # Der Task 'template' in der jeweiligen main.yml fuellt das Jinja2-
+  # Template der jeweiligen Role mit den Variablen aus host_vars und 
+  # group_vars und generiert daraus die Junos config.
+
+  roles:
+    - system
+    - chassis
+    - interfaces
+    - snmp
+    - routing-options
+    - protocols_ic
+    - access
+    - ethernet-switching-options
+    - vlans
+    - poe
