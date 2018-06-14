@@ -1,6 +1,15 @@
 #jinja2:lstrip_blocks: True
 {# role 'interfaces' in Playbook einbauen, um diesen Teil der config zu generieren 
 #}
+{# vlans_merged dict muss hier nochmal gebaut werden, auch wenn bereits in vlans-
+role geschehen. Loesung finden um vlan_merged als globale variable verfuegbar zu 
+machen. #}
+{% set vlans_merged = ({}) %}
+{% for area in vlans %}
+    {% for vln in area_vlans[area] %}
+        {% set _dummy = vlans_merged.update({vln:area_vlans[area][vln]}) %}
+    {% endfor %}
+{% endfor %}
 interfaces {
 {% for _ifrange_ in if_ranges|sort %}
     {% set ifrange = if_ranges[_ifrange_] %}
@@ -29,11 +38,11 @@ interfaces {
             {% endif %}
             {% if ifrange.vlan is defined %}
                 vlan {
-                    members {% if ifrange.vlan == 'all' %}all{% else %}{{ vlans[ifrange.vlan] }}{% endif %};
+                    members {% if ifrange.vlan == 'all' %}all{% else %}{{ vlans_merged[ifrange.vlan] }}{% endif %};
                 }
             {% elif ifrange.vlans is defined %}
                 vlan {
-                    members [ {% for vln in ifrange.vlans %}{{ vlans[vln] }} {% endfor %}];
+                    members [ {% for vln in ifrange.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
                 }
             {% endif %}
             {% if ifrange.native is defined %}
@@ -76,11 +85,11 @@ interfaces {
             {% endif %}
             {% if iface.vlan is defined %}
                 vlan {
-                    members {% if iface.vlan == 'all' %}all{% else %}{{ vlans[iface.vlan] }}{% endif %};
+                    members {% if iface.vlan == 'all' %}all{% else %}{{ vlans_merged[iface.vlan] }}{% endif %};
                 }
             {% elif iface.vlans is defined %}
                 vlan {
-                    members [ {% for vln in iface.vlans %}{{ vlans[vln] }} {% endfor %}];
+                    members [ {% for vln in iface.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
                 }
             {% endif %}
             {% if iface.native is defined %}
@@ -101,13 +110,13 @@ interfaces {
         }
     }
     vlan {
-        unit {{ mgmt.vlan }} {
+        unit {{ mgmt_group.vlan }} {
             description "{{ inventory_hostname }} Mgmt";
             family inet {
-                address {{ mgmt.v4_addr }}/24;
+                address {{ mgmt_host.v4_addr }}/24;
             }
             family inet6 {
-                address {{ mgmt.v6_addr }}/64;
+                address {{ mgmt_host.v6_addr }}/64;
             }
         }
     }

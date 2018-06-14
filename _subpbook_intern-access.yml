@@ -4,9 +4,6 @@
   connection: local
   gather_facts: no
   
-  vars_files:
-    - group_vars/intern_multiple.yml
-
   # Ansible schaut in roles/<role name>/tasks/main.yaml und fuehrt die
   # dortigen Tasks aus.
   # Der Task 'template' in der jeweiligen main.yml fuellt das Jinja2-
