@@ -2,7 +2,7 @@
 {# role 'vlans' in Playbook einbauen, um diesen Teil der config zu generieren 
 #}
 {% set vlans_merged = ({}) %}
-{% for area in vlans %}
+{% for area in group.vlans %}
     {% for vln in area_vlans[area] %}
         {% set _dummy = vlans_merged.update({vln:area_vlans[area][vln]}) %}
     {% endfor %}
@@ -11,7 +11,7 @@ vlans {
 {% for vln_id in vlans_merged|sort %}
     {{ vlans_merged[vln_id] }} {
         vlan-id {{ vln_id }};
-    {% if vln_id == mgmt_group.vlan %}
+    {% if vln_id == group.mgmt.vlan %}
         l3-interface vlan.{{ vln_id }};
     {% endif %}
     }

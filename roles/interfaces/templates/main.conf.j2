@@ -5,7 +5,7 @@
 role geschehen. Loesung finden um vlan_merged als globale variable verfuegbar zu 
 machen. #}
 {% set vlans_merged = ({}) %}
-{% for area in vlans %}
+{% for area in group.vlans %}
     {% for vln in area_vlans[area] %}
         {% set _dummy = vlans_merged.update({vln:area_vlans[area][vln]}) %}
     {% endfor %}
@@ -110,13 +110,13 @@ interfaces {
         }
     }
     vlan {
-        unit {{ mgmt_group.vlan }} {
+        unit {{ group.mgmt.vlan }} {
             description "{{ inventory_hostname }} Mgmt";
             family inet {
-                address {{ mgmt_host.v4_addr }}/24;
+                address {{ host.mgmt.v4_addr }}/24;
             }
             family inet6 {
-                address {{ mgmt_host.v6_addr }}/64;
+                address {{ host.mgmt.v6_addr }}/64;
             }
         }
     }
