@@ -1,5 +1,5 @@
 area_vlans:
-  multiple:
+  intern_multiple:
     44: VL0044_exampleorg-Mgmt_DENA
     88: VL0088_exampleorg_MGMT
     91: VL0091_exampleorg-Mgmt_Customer
