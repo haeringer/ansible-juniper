@@ -1,9 +1,34 @@
 #jinja2:lstrip_blocks: True
 {# role 'interfaces' in Playbook einbauen, um diesen Teil der config zu generieren 
 #}
+{# macro zum mergen der vlans #}
 {% import 'helpers/macros.j2' as macros with context %}
 {% set vlans_merged = ({}) %}
 {{ macros.merge_vlans(group.vlans, vlans_merged) }}
+{# macro fuer interface unit config, verwendet in interfaces und interface ranges #}
+{% macro int_unit(int) %}
+    {% if (int.mode is defined or int.vlan is defined or int.vlans is defined) %}
+        unit 0 {
+            family ethernet-switching {
+            {% if int.mode is defined %}
+                port-mode {{ int.mode }};
+            {% endif %}
+            {% if int.vlan is defined %}
+                vlan {
+                    members {% if int.vlan == 'all' %}all{% else %}{{ vlans_merged[int.vlan] }}{% endif %};
+                }
+            {% elif int.vlans is defined %}
+                vlan {
+                    members [ {% for vln in int.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
+                }
+            {% endif %}
+            {% if int.native is defined %}
+                native-vlan-id {{ int.native }};
+            {% endif %}
+            }
+        }{% endif %}
+{% endmacro %}
+{# beginn der junos interface config #}
 interfaces {
 {% for _ifrange_ in if_ranges|sort %}
     {% set ifrange = if_ranges[_ifrange_] %}
@@ -24,27 +49,7 @@ interfaces {
     {% if ifrange.member is defined %}
         member {{ ifrange.member }};
     {% endif %}
-    {% if (ifrange.mode is defined or ifrange.vlan is defined or ifrange.vlans is defined) %}
-        unit 0 {
-            family ethernet-switching {
-            {% if ifrange.mode is defined %}
-                port-mode {{ ifrange.mode }};
-            {% endif %}
-            {% if ifrange.vlan is defined %}
-                vlan {
-                    members {% if ifrange.vlan == 'all' %}all{% else %}{{ vlans_merged[ifrange.vlan] }}{% endif %};
-                }
-            {% elif ifrange.vlans is defined %}
-                vlan {
-                    members [ {% for vln in ifrange.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
-                }
-            {% endif %}
-            {% if ifrange.native is defined %}
-                native-vlan-id {{ ifrange.native }};
-            {% endif %}
-            }
-        }
-    {% endif %}
+    {{ int_unit(ifrange) }}
     }
 {% endfor %}
 {% for _iface in interfaces %}
@@ -71,27 +76,7 @@ interfaces {
         {% endif %}
         }
     {% endif %}
-    {% if (iface.vlan is defined or iface.vlans is defined) %}
-        unit 0 {
-            family ethernet-switching {
-            {% if iface.mode is defined %}
-                port-mode {{ iface.mode }};
-            {% endif %}
-            {% if iface.vlan is defined %}
-                vlan {
-                    members {% if iface.vlan == 'all' %}all{% else %}{{ vlans_merged[iface.vlan] }}{% endif %};
-                }
-            {% elif iface.vlans is defined %}
-                vlan {
-                    members [ {% for vln in iface.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
-                }
-            {% endif %}
-            {% if iface.native is defined %}
-                native-vlan-id {{ iface.native }};
-            {% endif %}
-            }
-        }
-    {% endif %}
+    {{ int_unit(iface) }}
     }
 {% endfor %}
     me0 {
