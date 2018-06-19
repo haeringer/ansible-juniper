@@ -1,4 +1,4 @@
-area_vlans:
+vlan_areas:
   intern_multiple:
     44: VL0044_exampleorg-Mgmt_DENA
     88: VL0088_exampleorg_MGMT
