@@ -1,5 +1,5 @@
 - name: Import cleanup playbook
-  import_playbook: _subpbook_cleanup.yml
+  import_playbook: _subpb_cleanup.yml
 
 - name: Get commited configuration of devices
   hosts: all
