@@ -1,6 +1,6 @@
 ## Requirements
 
-Ansible Release **2.5.0** (Playbooks sind nicht abwärtskompatibel!)
+Ansible Release >= **2.5** (Playbooks sind nicht abwärtskompatibel)
 
 Außerdem Juniper Ansible Galaxy Role inkl. Abhängigkeiten:
 
@@ -10,23 +10,23 @@ Außerdem Juniper Ansible Galaxy Role inkl. Abhängigkeiten:
 
 #### Playbook Optionen
 
-    -u     eigener Username (Tacacs-user in unserem Fall). Nicht nötig, falls dieser dem lokalen User entspricht
+    -u     eigener Username (Tacacs-user in unserem Fall). Angabe nicht nötig, falls dieser dem lokalen User entspricht
     -k     Aufforderung zur Passworteingabe (ansonsten wird SSH-Key verwendet)
-    -l     Ziel-Devices in hosts-Datei auf Gruppe limiteren, z.B. -l "lab-ex"
+    -l     Ziel-Devices in hosts-Datei auf Gruppe oder einzelnen Host limiteren, z.B. -l "lab-ex"
 
 
 ## Playbook zur Interface-Abfrage
 
 Abfrage des Interface-Status (führt ```show interfaces terse```+ ```descriptions``` via CLI aus), um z.B. freie Interfaces zu identifizieren
 
-	ansible-playbook -k get-interfaces.yml -l 'ia5.b0-noc'
+	ansible-playbook -k get-interfaces.yml -l 'ia1.b1'
 
 
 ## Playbook für 'show | compare'
 
-Konfigurationsänderungen können mit diesem Playbook verifiziert werden, ohne dass die Konfiguration committed wird
+Konfigurationsänderungen können mit diesem Playbook verifiziert werden, ohne dass die Konfiguration tatsächlich geändert oder committed wird. Die Konfiguration wird zudem direkt nach dem check + diff wieder vom Device entladen, so dass keinerlei Änderungen zurückbleiben. Entspricht strukturell main.yml (s.u.), lediglich ohne commit.
 
-	ansible-playbook -k compare.yml -l 'ia5.b0-noc'
+	ansible-playbook -k main-compare.yml -l 'ia1.b1'
 
 
 ## Playbook zur Automation der Infrastruktur
