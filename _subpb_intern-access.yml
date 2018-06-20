@@ -1,6 +1,6 @@
 ---
-- name: GENERATE JUNOS CONFIGURATION PARTS (intern)
-  hosts: intern
+- name: GENERATE JUNOS CONFIGURATION PARTS (intern_access)
+  hosts: intern_access
   connection: local
   gather_facts: no
 
