@@ -1,9 +1,9 @@
 ---
-- name: GENERATE JUNOS CONFIGURATION PARTS (intern_access)
-  hosts: intern_access
+- name: GENERATE JUNOS CONFIGURATION PARTS (intern)
+  hosts: intern
   connection: local
   gather_facts: no
-  
+
   # Ansible schaut in roles/<role name>/tasks/main.yaml und fuehrt die
   # dortigen Tasks aus.
   # Der Task 'template' in der jeweiligen main.yml fuellt das Jinja2-
