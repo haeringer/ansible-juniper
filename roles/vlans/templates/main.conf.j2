@@ -3,12 +3,12 @@
 #}
 {% import 'helpers/macros.j2' as macros with context %}
 {% set vlans_merged = ({}) %}
-{{ macros.merge_vlans(group.vlans, vlans_merged) }}
+{{ macros.merge_vlans(group.vlan_areas, vlans_merged) }}
 vlans {   
 {% for vln_id in vlans_merged|sort %}
     {{ vlans_merged[vln_id] }} {
         vlan-id {{ vln_id }};
-    {% if vln_id == group.mgmt.vlan %}
+    {% if vln_id == mgmt_shared.vlan %}
         l3-interface vlan.{{ vln_id }};
     {% endif %}
     }

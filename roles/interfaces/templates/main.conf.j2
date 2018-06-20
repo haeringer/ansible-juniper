@@ -4,7 +4,7 @@
 {# macro zum mergen der vlans #}
 {% import 'helpers/macros.j2' as macros with context %}
 {% set vlans_merged = ({}) %}
-{{ macros.merge_vlans(group.vlans, vlans_merged) }}
+{{ macros.merge_vlans(group.vlan_areas, vlans_merged) }}
 {# macro fuer interface unit config, verwendet in interfaces und interface ranges #}
 {% macro int_unit(int) %}
     {% if (int.mode is defined or int.vlan is defined or int.vlans is defined) %}
@@ -26,7 +26,8 @@
                 native-vlan-id {{ int.native }};
             {% endif %}
             }
-        }{% endif %}
+        }
+    {%- endif %}
 {% endmacro %}
 {# beginn der junos interface config #}
 interfaces {
@@ -89,13 +90,13 @@ interfaces {
         }
     }
     vlan {
-        unit {{ group.mgmt.vlan }} {
+        unit {{ mgmt_shared.vlan }} {
             description "{{ inventory_hostname }} Mgmt";
             family inet {
-                address {{ host.mgmt.v4_addr }}/24;
+                address {{ mgmt_host.v4_addr }}/24;
             }
             family inet6 {
-                address {{ host.mgmt.v6_addr }}/64;
+                address {{ mgmt_host.v6_addr }}/64;
             }
         }
     }
