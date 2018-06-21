@@ -1,5 +1,5 @@
 #jinja2:lstrip_blocks: True
-{# role 'interfaces' in Playbook einbauen, um diesen Teil der config zu generieren 
+{# role 'interfaces' in Playbook einbauen, um diesen Teil der config zu generieren
 #}
 {# macro zum mergen der vlans #}
 {% import 'helpers/macros.j2' as macros with context %}
@@ -7,7 +7,10 @@
 {{ macros.merge_vlans(group.vlan_areas, vlans_merged) }}
 {# macro fuer interface unit config, verwendet in interfaces und interface ranges #}
 {% macro int_unit(int) %}
-    {% if (int.mode is defined or int.vlan is defined or int.vlans is defined) %}
+    {% if (int.mode is defined or
+           int.vlan is defined or
+           int.vlans is defined or
+           int.vlan_areas is defined) %}
         unit 0 {
             family ethernet-switching {
             {% if int.mode is defined %}
@@ -20,6 +23,12 @@
             {% elif int.vlans is defined %}
                 vlan {
                     members [ {% for vln in int.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
+                }
+            {% elif int.vlan_areas is defined %}
+            {% set int_vlans_merged = ({}) %}
+            {{ macros.merge_vlans(int.vlan_areas, int_vlans_merged) }}
+                vlan {
+                    members [ {% for vlns in int_vlans_merged %}{{ int_vlans_merged[vlns] }} {% endfor %}];
                 }
             {% endif %}
             {% if int.native is defined %}
