@@ -1,8 +1,8 @@
-# Task erstellt config-build, pusht die config auf das device und fuehrt 
-# einen commit durch. Standardmaessig werden einzelne Hierarchie-Ebenen 
+# Task erstellt config-build, pusht die config auf das device und fuehrt
+# einen commit durch. Standardmaessig werden einzelne Hierarchie-Ebenen
 # der Junos-config ersetzt (Parameter load: 'update').
 
-- name: ASSEMBLE, PUSH & COMMIT
+- name: ASSEMBLE & PUSH
   hosts: all
   roles:
     - Juniper.junos
@@ -13,12 +13,16 @@
     - name: Assemble configuration parts
       local_action: assemble src={{ build_dir }} dest={{ junos_conf }}
 
-    - name: Push config to device and commit...
+    - name: Push config to device...
       juniper_junos_config:
-        src: "{{ junos_conf }}"
+        src: '{{ junos_conf }}'
         load: 'update'
         timeout: '60'
-#       confirm: 3
+        # commit vs compare bei ausfuehrung per extra variable (-e) angeben:
+        # ansible-playbook main.yml -e commit=yes|no
+        commit: '{{ commit }}'
+#       confirm: 1
+        diffs_file: '{{ compare_conf }}'
       register: response
 
     - name: 'Output diff if changes are present, else skip:'
@@ -29,4 +33,3 @@
     - name: 'Message from juniper_junos_config:'
       debug:
         var: response.msg
-    
