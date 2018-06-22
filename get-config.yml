@@ -9,11 +9,11 @@
 
   tasks:
 
-    - name: Retrieve config + save at ~/ansible_tmp/{hostname}/{hostname}.config
+    - name: Retrieve config + save at ~/ansible_tmp/{hostname}/{hostname}.{format}
       juniper_junos_config:
         retrieve: "committed"
+        # format bei ausfuehrung per extra variable (-e) angeben:
+        # ansible-playbook get-config.yml -e=format=text|set|xml|json
+        format: "{{ format }}"
         dest_dir: "{{ base_dir }}"
       register: response
-#    - name: Print result
-#      debug:
-#        var: response.config_lines
