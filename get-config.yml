@@ -13,7 +13,7 @@
       juniper_junos_config:
         retrieve: "committed"
         # format bei ausfuehrung per extra variable (-e) angeben:
-        # ansible-playbook get-config.yml -e=format=text|set|xml|json
+        # ansible-playbook get-config.yml -e format=text|set|xml|json
         format: "{{ format }}"
         dest_dir: "{{ base_dir }}"
       register: response
