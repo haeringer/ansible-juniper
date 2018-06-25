@@ -108,5 +108,31 @@ interfaces {
                 address {{ mgmt_host.v6_addr }}/64;
             }
         }
+{% if vlan_units is defined %}
+    {% for _unit in vlan_units %}
+        {% set unit = vlan_units[_unit] %}
+        unit {{ _unit }} {
+        {% if unit.desc is defined %}
+            description "{{ unit.desc }}";
+        {% endif %}
+        {% if unit.v4 is defined %}
+            family inet {
+            {% for _addr in unit.v4.addr %}
+            {% set addr = unit.v4[_addr] %}
+                address {{ _addr }};
+            {% endfor %}
+            }
+        {% endif %}
+        {% if unit.v6 is defined %}
+            family inet6 {
+            {% for _addr in unit.v6.addr %}
+            {% set addr = unit.v6[_addr] %}
+                address {{ _addr }};
+            {% endfor %}
+            }
+        {% endif %}
+        }
+    {% endfor %}
+{% endif %}
     }
 }

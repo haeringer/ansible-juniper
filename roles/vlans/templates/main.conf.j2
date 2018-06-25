@@ -1,15 +1,22 @@
 #jinja2:lstrip_blocks: True
-{# role 'vlans' in Playbook einbauen, um diesen Teil der config zu generieren 
+{# role 'vlans' in Playbook einbauen, um diesen Teil der config zu generieren
 #}
 {% import 'helpers/macros.j2' as macros with context %}
 {% set vlans_merged = ({}) %}
 {{ macros.merge_vlans(group.vlan_areas, vlans_merged) }}
-vlans {   
+vlans {
 {% for vln_id in vlans_merged|sort %}
     {{ vlans_merged[vln_id] }} {
         vlan-id {{ vln_id }};
     {% if vln_id == mgmt_shared.vlan %}
         l3-interface vlan.{{ vln_id }};
+    {% endif %}
+    {% if vlan_units is defined %}
+      {% for unit in vlan_units %}
+        {% if vln_id == unit %}
+        l3-interface vlan.{{ vln_id }};
+        {% endif %}
+      {% endfor %}
     {% endif %}
     }
 {% endfor %}
