@@ -5,4 +5,9 @@
         {% set _dummy = merged.update({vln:vlan_areas[area][vln]}) %}
     {% endfor %}
 {% endfor %}
+{% if vlans_host is defined %}
+    {% for vln in vlans_host %}
+        {% set _dummy = merged.update({vln:vlans_host[vln]}) %}
+    {% endfor %}
+{% endif %}
 {% endmacro %}
