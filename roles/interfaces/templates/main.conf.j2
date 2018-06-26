@@ -7,6 +7,27 @@
 {{ macros.merge_vlans(group.vlan_areas, vlans_merged) }}
 {# macro fuer interface unit config, verwendet in interfaces und interface ranges #}
 {% macro int_unit(int) %}
+    {% if int.desc is defined %}
+        description "{{ int.desc }}";
+    {% endif %}
+    {% if int.mtu is defined %}
+        mtu {{ int.mtu }};
+    {% endif %}
+    {% if int.etheroptions is defined %}
+        ether-options {
+        {% if int.etheroptions.no_auto == true %}
+            no-auto-negotiation;
+        {% endif %}
+        {% if int.etheroptions.half_duplex == true %}
+            link-mode full-duplex;
+        {% endif %}
+        {% if int.etheroptions.speed is defined %}
+            speed {
+                {{ int.etheroptions.speed }};
+            }
+        {% endif %}
+        }
+    {% endif %}
     {% if (int.mode is defined or
            int.vlan is defined or
            int.vlans is defined or
@@ -65,27 +86,6 @@ interfaces {
 {% for _iface in interfaces %}
     {% set iface = interfaces[_iface] %}
     {{ _iface }} {
-    {% if iface.desc is defined %}
-        description "{{ iface.desc }}";
-    {% endif %}
-    {% if iface.mtu is defined %}
-        mtu {{ iface.mtu }};
-    {% endif %}
-    {% if iface.etheroptions is defined %}
-        ether-options {
-        {% if iface.etheroptions.no_auto == true %}
-            no-auto-negotiation;
-        {% endif %}
-        {% if iface.etheroptions.half_duplex == true %}
-            link-mode full-duplex;
-        {% endif %}
-        {% if iface.etheroptions.speed is defined %}
-            speed {
-                {{ iface.etheroptions.speed }};
-            }
-        {% endif %}
-        }
-    {% endif %}
     {{ int_unit(iface) }}
     }
 {% endfor %}
