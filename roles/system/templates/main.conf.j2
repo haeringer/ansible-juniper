@@ -1,5 +1,5 @@
 #jinja2:lstrip_blocks: True
-{# role 'system' in Playbook einbauen, um diesen Teil der config zu generieren 
+{# role 'system' in Playbook einbauen, um diesen Teil der config zu generieren
 #}
 /* Config generiert durch Ansible */
 system {
@@ -18,7 +18,7 @@ system {
     }
     tacplus-server {
     {% for tacsrv in tacacs_servers %}
-        {{ tacsrv.ip }} { 
+        {{ tacsrv.ip }} {
             port 49;
             secret "{{ tacsrv.secret }}"; ## SECRET-DATA
             timeout 10;
@@ -28,7 +28,7 @@ system {
     {% endfor %}
     }
     login {
-		announcement "\n\t####   SYSTEM CONFIG GENERIERT DURCH ANSIBLE   ####\n\n\tManuelle Aenderungen per CLI werden ueberschrieben!\n\n\tInfos zur Automatisierung und Konfiguration:\n\thttps://wiki.intern.example.com/display/NOC/Automatisierung+im+NOC\n\n\n";
+		announcement "\n\t####   SYSTEM CONFIG GENERIERT DURCH ANSIBLE   ####\n\n\tManuelle Aenderungen per CLI werden ueberschrieben!\n\n\tInfos zur Konfiguration:\n\thttps://wiki.intern.example.com/x/coAhAQ\n\n\n";
         class rancid {
             permissions [ access admin firewall flow-tap interface network routing secret security snmp system trace view ];
         }
