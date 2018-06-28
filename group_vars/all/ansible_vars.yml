@@ -8,6 +8,3 @@ base_dir: ~/ansible_tmp/{{ inventory_hostname }}
 build_dir: ~/ansible_tmp/{{ inventory_hostname }}/pre-assemble
 junos_conf: ~/ansible_tmp/{{ inventory_hostname }}/junos.conf
 compare_conf: ~/ansible_tmp/{{ inventory_hostname }}/compare.conf
-
-# Workaround zur Nutzung auf MacOS
-ansible_python_interpreter: /usr/local/bin/python2.7
