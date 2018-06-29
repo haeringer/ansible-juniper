@@ -20,7 +20,7 @@ Außerdem Juniper Ansible Galaxy Role inkl. Abhängigkeiten:
 
 Abfrage des Interface-Status (führt ```show interfaces terse```+ ```descriptions``` via CLI aus), um z.B. freie Interfaces zu identifizieren
 
-	ansible-playbook -k get-interfaces.yml -l 'ia1.b1'
+	ansible-playbook -k get-interfaces.yml -l ia1.b1
 
 
 ## Playbook zur Automatisierung der Infrastruktur
@@ -33,4 +33,4 @@ Playbook konfiguriert alle Systeme via juniper_junos_config Modul. Wird bei Push
 
 Durch die Angabe der Extra-Variable ```commit=no``` kann ein "show | compare"-artiger Diff von Konfigurationsänderungen durchgeführt werden. Die config wird dabei auf das Device gepusht, verglichen und direkt anschließend ein Rollback durchgeführt. Damit können Änderungen non-destruktiv verifiziert werden.
 
-    ansible-playbook -k main.yml -l 'ia1.b1' -e commit=no
+    ansible-playbook -k main.yml -l ia1.b1 -e commit=no

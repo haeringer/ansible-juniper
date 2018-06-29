@@ -1,3 +1,4 @@
+---
 - name: Import cleanup playbook
   import_playbook: _subpb_cleanup.yml
 
