@@ -16,7 +16,10 @@
           - "show interfaces terse"
       register: response
 
-    - name: Print device output
+    - name: show interfaces descriptions
       debug:
-        var: item.stdout_lines
-      with_items: "{{ response.results }}" 
+        msg: "{{ response.results.0.stdout_lines }}"
+
+    - name: show interfaces terse
+      debug:
+        msg: "{{ response.results.1.stdout_lines }}"
