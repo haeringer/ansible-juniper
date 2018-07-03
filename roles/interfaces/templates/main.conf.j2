@@ -15,15 +15,18 @@
     {% endif %}
     {% if int.etheroptions is defined %}
         ether-options {
-        {% if int.etheroptions.no_auto == true %}
+        {% if int.etheroptions.no_auto is defined %}
             no-auto-negotiation;
         {% endif %}
-        {% if int.etheroptions.half_duplex == true %}
+        {% if int.etheroptions.no_auto.mode == 'full' %}
             link-mode full-duplex;
+        {% elif int.etheroptions.no_auto.mode == 'half' %}
+            no-flow-control;
+            link-mode half-duplex;
         {% endif %}
-        {% if int.etheroptions.speed is defined %}
+        {% if int.etheroptions.no_auto.speed is defined %}
             speed {
-                {{ int.etheroptions.speed }};
+                {{ int.etheroptions.no_auto.speed }};
             }
         {% endif %}
         }
