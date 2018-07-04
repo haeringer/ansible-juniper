@@ -34,3 +34,9 @@ Playbook konfiguriert alle Systeme via juniper_junos_config Modul. Wird bei Push
 Durch die Angabe der Extra-Variable ```commit=no``` kann ein "show | compare"-artiger Diff von Konfigurationsänderungen durchgeführt werden. Die config wird dabei auf das Device gepusht, verglichen und direkt anschließend ein Rollback durchgeführt. Damit können Änderungen non-destruktiv verifiziert werden.
 
     ansible-playbook -k main.yml -l ia1.b1 -e commit=no
+
+#### 'commit confirmed'
+
+Durch die optionale Angabe der Extra-Variable ```confirm=n``` kann ein 'commit confirmed' mit automatischem Rollback nach ```n``` Minuten durchgeführt werden.
+
+    ansible-playbook -k main.yml -l ia1.b1 -e 'commit=yes confirm=1'

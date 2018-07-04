@@ -22,7 +22,9 @@
         # commit vs compare bei ausfuehrung per extra variable (-e) angeben:
         # ansible-playbook main.yml -e commit=yes|no
         commit: '{{ commit }}'
-#       confirm: 1
+        # confirm optional per extra variable angeben:
+        # ansible-playbook main.yml -e 'commit=yes confirm=2'
+        confirm: "{{ confirm if confirm is defined else omit }}"
         diffs_file: '{{ compare_conf }}'
       register: response
 
