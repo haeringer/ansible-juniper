@@ -18,9 +18,9 @@
         {% if int.etheroptions.no_auto is defined %}
             no-auto-negotiation;
         {% endif %}
-        {% if int.etheroptions.no_auto.mode == 'full' %}
+        {% if int.etheroptions.no_auto.duplex == 'full' %}
             link-mode full-duplex;
-        {% elif int.etheroptions.no_auto.mode == 'half' %}
+        {% elif int.etheroptions.no_auto.duplex == 'half' %}
             no-flow-control;
             link-mode half-duplex;
         {% endif %}
