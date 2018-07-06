@@ -1,5 +1,5 @@
 #jinja2:lstrip_blocks: True
-{# role 'protocols_ia' in Playbook einbauen, um diesen Teil der config zu generieren 
+{# role 'protocols_ia' in Playbook einbauen, um diesen Teil der config zu generieren
 #}
 protocols {
     igmp-snooping {
@@ -35,12 +35,7 @@ protocols {
         interface access-ports {
             edge;
         }
-        interface uplinks {
-            bpdu-timeout-action {
-                block;
-            }
-        }
-        interface xlinks {
+        interface switch-links {
             bpdu-timeout-action {
                 block;
             }
@@ -61,8 +56,7 @@ protocols {
     }
     lldp {
         port-id-subtype interface-name;
-        interface uplinks;
-        interface xlinks;
+        interface switch-links;
     }
     lldp-med {
         interface access-ports;
