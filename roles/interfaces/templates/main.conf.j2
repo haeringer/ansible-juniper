@@ -10,23 +10,26 @@
     {% if int.desc is defined %}
         description "{{ int.desc }}";
     {% endif %}
+    {% if int.disable is defined and int.disable == true %}
+        disable;
+    {% endif %}
     {% if int.mtu is defined %}
         mtu {{ int.mtu }};
     {% endif %}
     {% if int.etheroptions is defined %}
         ether-options {
-        {% if int.etheroptions.no_auto is defined %}
+        {% if int.etheroptions.no_autoneg is defined and int.etheroptions.no_autoneg == true %}
             no-auto-negotiation;
         {% endif %}
-        {% if int.etheroptions.no_auto.duplex == 'full' %}
+        {% if int.etheroptions.duplex is defined and int.etheroptions.duplex == 'full' %}
             link-mode full-duplex;
-        {% elif int.etheroptions.no_auto.duplex == 'half' %}
+        {% elif int.etheroptions.duplex is defined and int.etheroptions.duplex == 'half' %}
             no-flow-control;
             link-mode half-duplex;
         {% endif %}
-        {% if int.etheroptions.no_auto.speed is defined %}
+        {% if int.etheroptions.speed is defined %}
             speed {
-                {{ int.etheroptions.no_auto.speed }};
+                {{ int.etheroptions.speed }};
             }
         {% endif %}
         }

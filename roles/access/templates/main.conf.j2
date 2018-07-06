@@ -1,7 +1,7 @@
 #jinja2:lstrip_blocks: True
-{# role 'access' in Playbook einbauen, um diesen Teil der config zu generieren 
+{# role 'access' in Playbook einbauen, um diesen Teil der config zu generieren
 #}
-{% if dot1x == true %}
+{% if dot1x is defined and dot1x == true %}
 access {
     radius-server {
     {% for radiussrv in radius_servers %}

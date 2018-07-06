@@ -5,7 +5,7 @@ protocols {
     igmp-snooping {
         vlan all;
     }
-{% if dot1x == true %}
+{% if dot1x is defined and dot1x == true %}
     dot1x {
         authenticator {
             authentication-profile-name PNAC1;
