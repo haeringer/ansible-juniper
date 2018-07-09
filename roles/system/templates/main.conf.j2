@@ -12,12 +12,12 @@ system {
         encrypted-password "{{ root_password }}"; ## SECRET-DATA
     }
     name-server {
-    {% for namesrv in name_servers %}
+    {% for namesrv in dns.servers %}
         {{ namesrv }};
     {% endfor %}
     }
     tacplus-server {
-    {% for tacsrv in tacacs_servers %}
+    {% for tacsrv in tacacs.servers %}
         {{ tacsrv.ip }} {
             port 49;
             secret "{{ tacsrv.secret }}"; ## SECRET-DATA
@@ -71,7 +71,7 @@ system {
         }
     }
     ntp {
-    {% for ntpsrv in ntp_servers %}
+    {% for ntpsrv in ntp.servers %}
         server {{ ntpsrv }};
     {% endfor %}
     }

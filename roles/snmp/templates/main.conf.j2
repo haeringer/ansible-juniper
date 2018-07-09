@@ -1,10 +1,10 @@
 #jinja2:lstrip_blocks: True
-{# role 'snmp' in Playbook einbauen, um diesen Teil der config zu generieren 
+{# role 'snmp' in Playbook einbauen, um diesen Teil der config zu generieren
 #}
 snmp {
-    location "{{ snmp.location }}";
-    contact "{{ snmp_contact }}";
-    community {{ snmp_community }} {
+    location "{{ location }}";
+    contact "{{ snmp.contact }}";
+    community {{ snmp.community }} {
         authorization read-only;
     }
     trap-group default {
@@ -20,7 +20,7 @@ snmp {
             configuration;
         }
         targets {
-        {% for snmpsrv in snmp_servers %}
+        {% for snmpsrv in snmp.servers %}
             {{ snmpsrv }};
         {% endfor %}
         }
