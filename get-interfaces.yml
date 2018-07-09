@@ -14,6 +14,7 @@
         commands:
           - "show interfaces descriptions"
           - "show interfaces terse"
+          - "show ethernet-switching interfaces"
       register: response
 
     - name: show interfaces descriptions
@@ -23,3 +24,7 @@
     - name: show interfaces terse
       debug:
         msg: "{{ response.results.1.stdout_lines }}"
+
+    - name: show ethernet-switching interfaces
+      debug:
+        msg: "{{ response.results.2.stdout_lines }}"
