@@ -29,3 +29,7 @@
     - name: show ethernet-switching interfaces
       debug:
         msg: "{{ response.results.2.stdout_lines }}"
+
+    - name: show lldp neighbors
+      debug:
+        msg: "{{ response.results.3.stdout_lines }}"
