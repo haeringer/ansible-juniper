@@ -15,6 +15,7 @@
           - "show interfaces descriptions"
           - "show interfaces terse"
           - "show ethernet-switching interfaces"
+          - "show lldp neighbors"
       register: response
 
     - name: show interfaces descriptions
