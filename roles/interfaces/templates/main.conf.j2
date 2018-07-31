@@ -1,4 +1,4 @@
-#jinja2:lstrip_blocks: True
+#jinja2:lstrip_blocks: True, trim_blocks: True
 {# role 'interfaces' in Playbook einbauen, um diesen Teil der config zu generieren
 #}
 {# macro zum mergen der vlans #}
@@ -43,13 +43,16 @@
             {% if int.mode is defined %}
                 port-mode {{ int.mode }};
             {% endif %}
-            {% if int.vlan is defined %}
+            {% if int.vlans is defined %}
                 vlan {
-                    members {% if int.vlan == 'all' %}all{% else %}{{ vlans_merged[int.vlan] }}{% endif %};
-                }
-            {% elif int.vlans is defined %}
-                vlan {
-                    members [ {% for vln in int.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
+                    members{{' '}}
+                {%- if int.vlans == 'all' -%}
+                    all;
+                {% elif int.vlans is number -%}
+                    {{ vlans_merged[int.vlans] }};
+                {% elif int.vlans is sequence -%}
+                    [ {% for vln in int.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
+                {% endif %}
                 }
             {% elif int.vlan_areas is defined %}
             {% set int_vlans_merged = ({}) %}
@@ -71,20 +74,22 @@ interfaces {
     {% set ifrange = if_ranges[_ifrange_] %}
     interface-range {{ _ifrange_ }} {
     {% if ifrange.member_ranges is defined %}
+      {% if ifrange.member_ranges is string %}
+        member-range {{ ifrange.member_ranges }};
+      {% elif ifrange.member_ranges is sequence %}
         {% for rng in ifrange.member_ranges %}
         member-range {{ rng }};
         {% endfor %}
-    {% endif %}
-    {% if ifrange.member_range is defined %}
-        member-range {{ ifrange.member_range }};
+      {% endif %}
     {% endif %}
     {% if ifrange.members is defined %}
+      {% if ifrange.members is string %}
+        member {{ ifrange.members }};
+      {% elif ifrange.members is sequence %}
         {% for intf in ifrange.members %}
         member {{ intf }};
         {% endfor %}
-    {% endif %}
-    {% if ifrange.member is defined %}
-        member {{ ifrange.member }};
+      {% endif %}
     {% endif %}
     {{ int_unit(ifrange) }}
     }
