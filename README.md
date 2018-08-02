@@ -40,3 +40,9 @@ Durch die Angabe der Extra-Variable ```commit=no``` kann ein "show | compare"-ar
 Durch die optionale Angabe der Extra-Variable ```confirm=n``` kann ein 'commit confirmed' mit automatischem Rollback nach ```n``` Minuten durchgeführt werden.
 
     ansible-playbook -k main.yml -l ia1.b1 -e 'commit=yes confirm=1'
+
+#### Config nur lokal generieren, ohne zu pushen
+
+Durch die optionale Angabe der Extra-Variable ```push=false``` kann das Playbook ausgeführt werden, ohne dass überhaupt etwas auf die Geräte gepusht wird. So lässt sich z.B. die generierte Config lokal überprüfen.
+
+    ansible-playbook -k main.yml -l ia1.b1 -e push=false

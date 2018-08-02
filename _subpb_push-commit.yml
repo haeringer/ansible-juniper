@@ -10,26 +10,29 @@
   gather_facts: no
 
   tasks:
+    - block:
 
-    - name: Push config to device...
-      juniper_junos_config:
-        src: '{{ junos_conf }}'
-        load: 'update'
-        timeout: '60'
-        # commit vs compare bei ausfuehrung per extra variable (-e) angeben:
-        # ansible-playbook main.yml -e commit=yes|no
-        commit: '{{ commit }}'
-        # confirm optional per extra variable angeben:
-        # ansible-playbook main.yml -e 'commit=yes confirm=2'
-        confirm: "{{ confirm if confirm is defined else omit }}"
-        diffs_file: '{{ compare_conf }}'
-      register: response
+      - name: Push config to device...
+        juniper_junos_config:
+          src: '{{ junos_conf }}'
+          load: 'update'
+          timeout: '60'
+          # commit vs compare bei ausfuehrung per extra variable (-e) angeben:
+          # ansible-playbook main.yml -e commit=yes|no
+          commit: '{{ commit }}'
+          # confirm optional per extra variable angeben:
+          # ansible-playbook main.yml -e 'commit=yes confirm=2'
+          confirm: "{{ confirm if confirm is defined else omit }}"
+          diffs_file: '{{ compare_conf }}'
+        register: response
 
-    - name: 'Output diff if changes are present, else skip:'
-      debug:
-        var: response.diff_lines
-      when: response.diff_lines is defined
+      - name: 'Output diff if changes are present, else skip:'
+        debug:
+          var: response.diff_lines
+        when: response.diff_lines is defined
 
-    - name: 'Message from juniper_junos_config:'
-      debug:
-        var: response.msg
+      - name: 'Message from juniper_junos_config:'
+        debug:
+          var: response.msg
+
+      when: push is not defined
