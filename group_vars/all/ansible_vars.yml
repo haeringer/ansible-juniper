@@ -5,6 +5,6 @@ ansible_network_os: junos
 
 # Temporary directories for building the device configs
 base_dir: ~/ansible_tmp/{{ inventory_hostname }}
-build_dir: ~/ansible_tmp/{{ inventory_hostname }}/pre-assemble
-junos_conf: ~/ansible_tmp/{{ inventory_hostname }}/junos.conf
-compare_conf: ~/ansible_tmp/{{ inventory_hostname }}/compare.conf
+build_dir: '{{ base_dir }}/build'
+junos_conf: '{{ build_dir }}/junos.conf'
+compare_conf: '{{ base_dir }}/compare.conf'
