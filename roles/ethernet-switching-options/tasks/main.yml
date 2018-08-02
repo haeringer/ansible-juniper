@@ -1,3 +1,0 @@
----
-- name: build config
-  local_action: template src=main.conf.j2 dest={{ build_dir }}/080_ethernet-switching-options.conf.part

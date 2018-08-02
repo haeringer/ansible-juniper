@@ -3,16 +3,13 @@
 # einen commit durch. Standardmaessig werden einzelne Hierarchie-Ebenen
 # der Junos-config ersetzt (Parameter load: 'update').
 
-- name: ASSEMBLE & PUSH
+- name: PUSH & COMMIT (CHECK)
   hosts: all
   roles:
     - Juniper.junos
   gather_facts: no
 
   tasks:
-
-    - name: Assemble configuration parts
-      local_action: assemble src={{ build_dir }} dest={{ junos_conf }}
 
     - name: Push config to device...
       juniper_junos_config:

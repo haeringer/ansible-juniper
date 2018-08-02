@@ -2,4 +2,4 @@
 - import_playbook: _subpb_cleanup.yml
 - import_playbook: _subpb_intern-access.yml
 - import_playbook: _subpb_intern-core.yml
-- import_playbook: _subpb_assemble-push.yml
+- import_playbook: _subpb_push-commit.yml

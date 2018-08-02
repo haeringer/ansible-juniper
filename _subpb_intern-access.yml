@@ -1,5 +1,5 @@
 ---
-- name: GENERATE JUNOS CONFIGURATION PARTS (intern_access)
+- name: GENERATE JUNOS CONFIGURATION (Juniper EX intern access)
   hosts: intern_access
   connection: local
   gather_facts: no
@@ -10,13 +10,4 @@
   # Template der jeweiligen Role mit den Variablen aus host_vars und
   # group_vars und generiert daraus die Junos config.
   roles:
-    - system
-    - chassis
-    - interfaces
-    - snmp
-    - routing-options
-    - protocols_ia
-    - access
-    - ethernet-switching-options
-    - vlans
-    - poe
+    - ex_intern-access
