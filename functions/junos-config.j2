@@ -478,7 +478,7 @@ vlans {
 
 {% macro junos_poe() -%}
 poe {
-    interface access-ports;
+    interface all;
     {% if poe is defined %}
         {% if poe.static == true %}
     management static;
