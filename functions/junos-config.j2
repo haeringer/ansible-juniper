@@ -146,14 +146,14 @@ chassis {
                 {% elif int.vlans is number -%}
                     {{ vlans_merged[int.vlans] }};
                 {% elif int.vlans is sequence -%}
-                    [ {% for vln in int.vlans %}{{ vlans_merged[vln] }} {% endfor %}];
+                    [ {% for vln in int.vlans|sort %}{{ vlans_merged[vln] }} {% endfor %}];
                 {% endif %}
                 }
             {% elif int.vlan_areas is defined %}
             {% set int_vlans_merged = ({}) %}
             {{ helpers.merge_vlans(int.vlan_areas, int_vlans_merged) }}
                 vlan {
-                    members [ {% for vlns in int_vlans_merged %}{{ int_vlans_merged[vlns] }} {% endfor %}];
+                    members [ {% for vlns in int_vlans_merged|sort %}{{ int_vlans_merged[vlns] }} {% endfor %}];
                 }
             {% endif %}
             {% if int.native is defined %}
