@@ -103,7 +103,7 @@ chassis {
 
 {% macro int_unit(int) -%}
     {% if int.desc is defined %}
-        description "{{ int.desc }}";
+    description "{{ int.desc }}";
     {% endif %}
     {% if int.disable is defined and int.disable == true %}
         disable;
@@ -130,7 +130,6 @@ chassis {
         }
     {% endif %}
     {% if (int.mode is defined or
-           int.vlan is defined or
            int.vlans is defined or
            int.vlan_areas is defined) %}
         unit 0 {
@@ -192,7 +191,7 @@ interfaces {
     {{ int_unit(ifrange) }}
     }
     {% endfor %}
-    {% for _iface in interfaces %}
+    {% for _iface in interfaces|sort %}
     {% set iface = interfaces[_iface] %}
     {{ _iface }} {
     {{ int_unit(iface) }}
@@ -479,6 +478,16 @@ vlans {
 
 {% macro junos_poe() -%}
 poe {
-    interface all;
+    interface access-ports;
+    {% if poe is defined %}
+        {% if poe.static == true %}
+    management static;
+            {% for iface in interfaces %}
+    interface {{ iface }} {
+        maximum-power {{ poe.interface_max_power }};
+    }
+            {% endfor %}
+        {% endif %}
+    {% endif %}
 }
 {%- endmacro %}
