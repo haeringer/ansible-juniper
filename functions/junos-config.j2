@@ -90,6 +90,18 @@ system {
 
 {% macro junos_chassis() -%}
 chassis {
+    {% set ns = namespace(ae_devices=false,ae_count=0) %}
+    {% for _iface in interfaces if 'ae' in _iface %}
+        {% set ns.ae_count = ns.ae_count + 1 %}
+        {% set ns.ae_devices = true %}
+    {% endfor %}
+    {% if ns.ae_devices == true %}
+    aggregated-devices {
+        ethernet {
+            device-count {{ ns.ae_count }};
+        }
+    }
+    {% endif %}
     alarm {
         management-ethernet {
             link-down ignore;
@@ -101,7 +113,7 @@ chassis {
 {############################################################}
 {# 'sub-macro' fuer interface unit config, verwendet in interfaces und interface ranges #}
 
-{% macro int_unit(int) -%}
+{% macro int_unit(int, int_name) -%}
     {% if int.desc is defined %}
     description "{{ int.desc }}";
     {% endif %}
@@ -113,6 +125,9 @@ chassis {
     {% endif %}
     {% if int.etheroptions is defined %}
         ether-options {
+        {% if int.etheroptions.lacp_interface is defined %}
+            802.3ad {{ int.etheroptions.lacp_interface }};
+        {% endif %}
         {% if int.etheroptions.no_autoneg is defined and int.etheroptions.no_autoneg == true %}
             no-auto-negotiation;
         {% endif %}
@@ -127,6 +142,13 @@ chassis {
                 {{ int.etheroptions.speed }};
             }
         {% endif %}
+        }
+    {% endif %}
+    {% if 'ae' in int_name %}
+        aggregated-ether-options {
+            lacp {
+                active;
+            }
         }
     {% endif %}
     {% if (int.mode is defined or
@@ -167,9 +189,9 @@ chassis {
 
 {% macro junos_interfaces() -%}
 interfaces {
-    {% for _ifrange_ in if_ranges|sort %}
-    {% set ifrange = if_ranges[_ifrange_] %}
-    interface-range {{ _ifrange_ }} {
+    {% for _ifrange in if_ranges|sort %}
+    {% set ifrange = if_ranges[_ifrange] %}
+    interface-range {{ _ifrange }} {
         {% if ifrange.member_ranges is defined %}
             {% if ifrange.member_ranges is string %}
         member-range {{ ifrange.member_ranges }};
@@ -188,13 +210,13 @@ interfaces {
                 {% endfor %}
             {% endif %}
         {% endif %}
-    {{ int_unit(ifrange) }}
+    {{ int_unit(ifrange, _ifrange) }}
     }
     {% endfor %}
     {% for _iface in interfaces|sort %}
     {% set iface = interfaces[_iface] %}
     {{ _iface }} {
-    {{ int_unit(iface) }}
+    {{ int_unit(iface, _iface) }}
     }
     {% endfor %}
     me0 {
