@@ -1,0 +1,14 @@
+#jinja2:lstrip_blocks: True
+
+{%- import 'functions/junos-config.j2' as config with context -%}
+
+{# config-template macros #}
+{{ config.junos_system() }}
+{{ config.junos_chassis() }}
+{{ config.junos_interfaces() }}
+{{ config.junos_snmp() }}
+{{ config.junos_routing_options() }}
+{{ config.junos_protocols_ex_e() }}
+{{ config.junos_access() }}
+{{ config.junos_ethernet_switching_options() }}
+{{ config.junos_vlans() }}

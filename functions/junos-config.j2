@@ -428,6 +428,358 @@ protocols {
 }
 {%- endmacro %}
 
+{# protocols config template macro ex extern #}
+
+{% macro junos_protocols_ex_e() -%}
+mstp {
+    configuration-name exampleorg-l2core;
+    max-hops 128;
+    max-age 20;
+    hello-time 2;
+    forward-delay 15;
+    inactive: traceoptions {
+        file mstp-debug;
+        flag all;
+    }
+    bridge-priority 16k;
+    interface ge-0/0/0.0 {
+        disable;
+    }
+    interface ge-0/0/1.0 {
+        disable;
+    }
+    interface ge-0/0/2.0 {
+        disable;
+    }
+    interface ge-0/0/3.0 {
+        disable;
+    }
+    interface ge-0/0/4.0 {
+        disable;
+    }
+    interface ge-0/0/5.0 {
+        disable;
+    }
+    interface ge-0/0/6.0 {
+        disable;
+    }
+    interface ge-0/0/7.0 {
+        disable;
+    }
+    interface ge-0/0/10.0 {
+        disable;
+    }
+    interface ge-0/0/12.0 {
+        disable;
+    }
+    interface ge-0/0/13.0 {
+        disable;
+    }
+    interface ge-0/0/21.0 {
+        bpdu-timeout-action {
+            block;
+            log;
+        }
+    }
+    interface xe-0/1/1.0 {
+        mode point-to-point;
+        bpdu-timeout-action {
+            block;
+            log;
+        }
+    }
+    interface ge-1/0/0.0 {
+        disable;
+        edge;
+    }
+    interface ge-1/0/1.0 {
+        disable;
+    }
+    interface ge-1/0/2.0 {
+        disable;
+    }
+    interface ge-1/0/3.0 {
+        disable;
+    }
+    interface ge-1/0/4.0 {
+        disable;
+    }
+    interface ge-1/0/5.0 {
+        disable;
+    }
+    interface ge-1/0/6.0 {
+        disable;
+    }
+    interface ge-1/0/7.0 {
+        disable;
+    }
+    interface ge-1/0/8.0 {
+        disable;
+    }
+    interface ge-1/0/9.0 {
+        disable;
+    }
+    interface ge-1/0/10.0 {
+        disable;
+    }
+    interface ge-1/0/11.0 {
+        disable;
+    }
+    interface ge-1/0/12.0 {
+        disable;
+    }
+    interface ge-1/0/13.0 {
+        disable;
+    }
+    interface ge-1/0/14.0 {
+        disable;
+    }
+    interface ge-1/0/15.0 {
+        disable;
+    }
+    interface ge-1/0/17.0 {
+        disable;
+    }
+    interface ge-1/0/18.0 {
+        disable;
+    }
+    interface ge-1/0/19.0 {
+        disable;
+    }
+    interface ge-1/0/22.0 {
+        disable;
+    }
+    interface ge-1/0/23.0 {
+        disable;
+    }
+    interface ge-2/0/0.0 {
+        disable;
+    }
+    interface ge-2/0/2.0 {
+        disable;
+    }
+    interface ge-2/0/4.0 {
+        disable;
+    }
+    interface ge-2/0/5.0 {
+        disable;
+    }
+    interface ge-2/0/6.0 {
+        disable;
+    }
+    interface ge-2/0/7.0 {
+        disable;
+    }
+    interface ge-2/0/9.0 {
+        disable;
+    }
+    interface ge-2/0/10.0 {
+        disable;
+    }
+    interface ge-2/0/12.0 {
+        disable;
+    }
+    interface ge-2/0/17.0 {
+        disable;
+    }
+    interface ge-2/0/18.0 {
+        disable;
+    }
+    interface ge-2/0/19.0 {
+        disable;
+    }
+    interface ge-2/0/20.0 {
+        disable;
+    }
+    interface ge-2/0/21.0 {
+        disable;
+    }
+    interface ge-2/0/22.0 {
+        disable;
+    }
+    interface ge-2/0/23.0 {
+        disable;
+    }
+    interface xe-2/1/0.0 {
+        mode point-to-point;
+        bpdu-timeout-action {
+            block;
+            log;
+        }
+    }
+    interface ge-3/0/0.0 {
+        disable;
+    }
+    interface ge-3/0/1.0 {
+        disable;
+    }
+    interface ge-3/0/2.0 {
+        disable;
+    }
+    interface ge-3/0/3.0 {
+        disable;
+    }
+    interface ge-3/0/4.0 {
+        disable;
+    }
+    interface ge-3/0/5.0 {
+        disable;
+    }
+    interface ge-3/0/6.0 {
+        disable;
+    }
+    interface ge-3/0/7.0 {
+        disable;
+    }
+    interface ge-3/0/8.0 {
+        disable;
+    }
+    interface ge-3/0/9.0 {
+        disable;
+    }
+    interface ge-3/0/10.0 {
+        disable;
+    }
+    interface ge-3/0/11.0 {
+        disable;
+    }
+    interface ge-3/0/12.0 {
+        disable;
+    }
+    interface ge-3/0/13.0 {
+        disable;
+    }
+    interface ge-3/0/14.0 {
+        disable;
+    }
+    interface ge-3/0/19.0 {
+        disable;
+    }
+    interface xe-3/1/1.0 {
+        disable;
+    }
+    interface ge-4/0/0.0 {
+        disable;
+    }
+    interface ge-4/0/1.0 {
+        disable;
+    }
+    interface ge-4/0/4.0 {
+        disable;
+    }
+    interface ge-4/0/6.0 {
+        disable;
+    }
+    interface ge-4/0/7.0 {
+        disable;
+    }
+    interface ge-4/0/8.0 {
+        disable;
+    }
+    interface ge-4/0/9.0 {
+        disable;
+    }
+    interface ge-4/0/10.0 {
+        disable;
+    }
+    interface ge-4/0/11.0 {
+        disable;
+    }
+    interface ge-4/0/12.0 {
+        disable;
+    }
+    interface ge-4/0/13.0 {
+        disable;
+    }
+    interface ge-4/0/15.0 {
+        disable;
+    }
+    interface ge-4/0/16.0 {
+        disable;
+    }
+    interface ge-4/0/17.0 {
+        disable;
+    }
+    interface ge-4/0/18.0 {
+        disable;
+    }
+    interface ge-4/0/19.0 {
+        disable;
+    }
+    interface ge-4/0/20.0 {
+        disable;
+    }
+    interface ge-4/0/21.0 {
+        disable;
+    }
+    interface ge-5/0/0.0 {
+        disable;
+    }
+    interface ae0.0 {
+        mode point-to-point;
+        bpdu-timeout-action {
+            block;
+            log;
+        }
+    }
+    interface ae1.0 {
+        disable;
+    }
+    interface ae2.0 {
+        disable;
+    }
+    interface all {
+        edge;
+    }
+    interface wolken-uplinks {
+        disable;
+    }
+    msti 1 {
+        bridge-priority 32k;
+        vlan 3000-3049;
+    }
+    msti 2 {
+        bridge-priority 32k;
+        vlan 3050-3099;
+    }
+    msti 3 {
+        bridge-priority 32k;
+        vlan [ 2-1500 3100-3600 ];
+    }
+    msti 4 {
+        bridge-priority 32k;
+        vlan [ 1501-2999 3601-4094 ];
+    }
+    bpdu-block-on-edge;
+}
+lldp {
+    interface xe-0/1/1.0;
+    interface xe-0/1/0.0;
+    interface xe-2/1/0.0;
+    interface xe-3/1/1.0;
+    interface xe-2/1/1.0;
+    interface xe-1/1/1.0;
+    interface ge-0/0/22.0;
+    interface ge-0/0/23.0;
+    interface ge-0/0/21.0;
+    interface ge-0/0/20.0;
+    interface ge-0/0/4.0;
+    interface ge-0/0/9.0;
+}
+lldp-med {
+    interface xe-0/1/1.0;
+    interface xe-0/1/0.0;
+    interface xe-2/1/0.0;
+    interface xe-3/1/1.0;
+    interface xe-2/1/1.0;
+    interface xe-1/1/1.0;
+    interface ge-0/0/22.0;
+    interface ge-0/0/23.0;
+    interface ge-0/0/21.0;
+    interface ge-0/0/20.0;
+}
+{%- endmacro %}
+
 {############################################################}
 {# access config template macro #}
 
