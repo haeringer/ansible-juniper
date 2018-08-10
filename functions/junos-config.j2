@@ -1,8 +1,9 @@
 {# helper-macro zum mergen der vlans aufrufen #}
 {% import 'functions/helpers.j2' as helpers with context %}
 {% set vlans_merged = ({}) %}
-{{ helpers.merge_vlans(group.vlan_areas, vlans_merged) }}
-
+{% if group is defined %}
+{{ helpers.merge_vlans(group.vlan_groups, vlans_merged) }}
+{% endif %}
 
 {############################################################}
 {# system config template macro #}
@@ -43,7 +44,6 @@ system {
     {% endfor %}
     {% for usr in users %}
         user {{ usr.name }} {
-            uid {{ usr.uid }};
             class {{ usr.class }};
             {% if usr.passwd is defined %}
             authentication {
@@ -79,6 +79,9 @@ system {
             interactive-commands any;
         }
     }
+    {% if virtualchassis is defined %}
+    commit synchronize;
+    {% endif %}
     ntp {
     {% for ntpsrv in ntp.servers %}
         server {{ ntpsrv }};
@@ -155,7 +158,7 @@ chassis {
     {% endif %}
     {% if (int.mode is defined or
            int.vlans is defined or
-           int.vlan_areas is defined) %}
+           int.vlan_groups is defined) %}
         unit 0 {
             family ethernet-switching {
             {% if int.mode is defined %}
@@ -172,9 +175,9 @@ chassis {
                     [ {% for vln in int.vlans|sort %}{{ vlans_merged[vln] }} {% endfor %}];
                 {% endif %}
                 }
-            {% elif int.vlan_areas is defined %}
+            {% elif int.vlan_groups is defined %}
             {% set int_vlans_merged = ({}) %}
-            {{ helpers.merge_vlans(int.vlan_areas, int_vlans_merged) }}
+            {{ helpers.merge_vlans(int.vlan_groups, int_vlans_merged) }}
                 vlan {
                     members [ {% for vlns in int_vlans_merged|sort %}{{ int_vlans_merged[vlns] }} {% endfor %}];
                 }
@@ -231,7 +234,7 @@ interfaces {
         }
     }
     vlan {
-        unit {{ mgmt_shared.vlan }} {
+        unit {{ mgmt_net.vlan }} {
             description "{{ inventory_hostname }} Mgmt";
             family inet {
                 address {{ mgmt_host.v4_addr }}/24;
@@ -308,11 +311,11 @@ snmp {
 routing-options {
     rib inet6.0 {
         static {
-            route ::/0 next-hop {{ mgmt_shared.v6_defaultgw }};
+            route ::/0 next-hop {{ mgmt_net.v6_defaultgw }};
         }
     }
     static {
-        route 0.0.0.0/0 next-hop {{ mgmt_shared.v4_defaultgw }};
+        route 0.0.0.0/0 next-hop {{ mgmt_net.v4_defaultgw }};
     }
 }
 {%- endmacro %}
@@ -447,33 +450,7 @@ mstp {
     interface ge-0/0/0.0 {
         disable;
     }
-    interface ge-0/0/1.0 {
-        disable;
-    }
-    interface ge-0/0/2.0 {
-        disable;
-    }
-    interface ge-0/0/3.0 {
-        disable;
-    }
-    interface ge-0/0/4.0 {
-        disable;
-    }
-    interface ge-0/0/5.0 {
-        disable;
-    }
-    interface ge-0/0/6.0 {
-        disable;
-    }
-    interface ge-0/0/7.0 {
-        disable;
-    }
-    interface ge-0/0/10.0 {
-        disable;
-    }
-    interface ge-0/0/12.0 {
-        disable;
-    }
+    [...]
     interface ge-0/0/13.0 {
         disable;
     }
@@ -497,108 +474,7 @@ mstp {
     interface ge-1/0/1.0 {
         disable;
     }
-    interface ge-1/0/2.0 {
-        disable;
-    }
-    interface ge-1/0/3.0 {
-        disable;
-    }
-    interface ge-1/0/4.0 {
-        disable;
-    }
-    interface ge-1/0/5.0 {
-        disable;
-    }
-    interface ge-1/0/6.0 {
-        disable;
-    }
-    interface ge-1/0/7.0 {
-        disable;
-    }
-    interface ge-1/0/8.0 {
-        disable;
-    }
-    interface ge-1/0/9.0 {
-        disable;
-    }
-    interface ge-1/0/10.0 {
-        disable;
-    }
-    interface ge-1/0/11.0 {
-        disable;
-    }
-    interface ge-1/0/12.0 {
-        disable;
-    }
-    interface ge-1/0/13.0 {
-        disable;
-    }
-    interface ge-1/0/14.0 {
-        disable;
-    }
-    interface ge-1/0/15.0 {
-        disable;
-    }
-    interface ge-1/0/17.0 {
-        disable;
-    }
-    interface ge-1/0/18.0 {
-        disable;
-    }
-    interface ge-1/0/19.0 {
-        disable;
-    }
-    interface ge-1/0/22.0 {
-        disable;
-    }
-    interface ge-1/0/23.0 {
-        disable;
-    }
-    interface ge-2/0/0.0 {
-        disable;
-    }
-    interface ge-2/0/2.0 {
-        disable;
-    }
-    interface ge-2/0/4.0 {
-        disable;
-    }
-    interface ge-2/0/5.0 {
-        disable;
-    }
-    interface ge-2/0/6.0 {
-        disable;
-    }
-    interface ge-2/0/7.0 {
-        disable;
-    }
-    interface ge-2/0/9.0 {
-        disable;
-    }
-    interface ge-2/0/10.0 {
-        disable;
-    }
-    interface ge-2/0/12.0 {
-        disable;
-    }
-    interface ge-2/0/17.0 {
-        disable;
-    }
-    interface ge-2/0/18.0 {
-        disable;
-    }
-    interface ge-2/0/19.0 {
-        disable;
-    }
-    interface ge-2/0/20.0 {
-        disable;
-    }
-    interface ge-2/0/21.0 {
-        disable;
-    }
-    interface ge-2/0/22.0 {
-        disable;
-    }
+    [...]
     interface ge-2/0/23.0 {
         disable;
     }
@@ -612,105 +488,7 @@ mstp {
     interface ge-3/0/0.0 {
         disable;
     }
-    interface ge-3/0/1.0 {
-        disable;
-    }
-    interface ge-3/0/2.0 {
-        disable;
-    }
-    interface ge-3/0/3.0 {
-        disable;
-    }
-    interface ge-3/0/4.0 {
-        disable;
-    }
-    interface ge-3/0/5.0 {
-        disable;
-    }
-    interface ge-3/0/6.0 {
-        disable;
-    }
-    interface ge-3/0/7.0 {
-        disable;
-    }
-    interface ge-3/0/8.0 {
-        disable;
-    }
-    interface ge-3/0/9.0 {
-        disable;
-    }
-    interface ge-3/0/10.0 {
-        disable;
-    }
-    interface ge-3/0/11.0 {
-        disable;
-    }
-    interface ge-3/0/12.0 {
-        disable;
-    }
-    interface ge-3/0/13.0 {
-        disable;
-    }
-    interface ge-3/0/14.0 {
-        disable;
-    }
-    interface ge-3/0/19.0 {
-        disable;
-    }
-    interface xe-3/1/1.0 {
-        disable;
-    }
-    interface ge-4/0/0.0 {
-        disable;
-    }
-    interface ge-4/0/1.0 {
-        disable;
-    }
-    interface ge-4/0/4.0 {
-        disable;
-    }
-    interface ge-4/0/6.0 {
-        disable;
-    }
-    interface ge-4/0/7.0 {
-        disable;
-    }
-    interface ge-4/0/8.0 {
-        disable;
-    }
-    interface ge-4/0/9.0 {
-        disable;
-    }
-    interface ge-4/0/10.0 {
-        disable;
-    }
-    interface ge-4/0/11.0 {
-        disable;
-    }
-    interface ge-4/0/12.0 {
-        disable;
-    }
-    interface ge-4/0/13.0 {
-        disable;
-    }
-    interface ge-4/0/15.0 {
-        disable;
-    }
-    interface ge-4/0/16.0 {
-        disable;
-    }
-    interface ge-4/0/17.0 {
-        disable;
-    }
-    interface ge-4/0/18.0 {
-        disable;
-    }
-    interface ge-4/0/19.0 {
-        disable;
-    }
-    interface ge-4/0/20.0 {
-        disable;
-    }
+    [...]
     interface ge-4/0/21.0 {
         disable;
     }
@@ -757,28 +535,9 @@ mstp {
 lldp {
     interface xe-0/1/1.0;
     interface xe-0/1/0.0;
-    interface xe-2/1/0.0;
-    interface xe-3/1/1.0;
-    interface xe-2/1/1.0;
-    interface xe-1/1/1.0;
-    interface ge-0/0/22.0;
-    interface ge-0/0/23.0;
-    interface ge-0/0/21.0;
-    interface ge-0/0/20.0;
+    [...]
     interface ge-0/0/4.0;
     interface ge-0/0/9.0;
-}
-lldp-med {
-    interface xe-0/1/1.0;
-    interface xe-0/1/0.0;
-    interface xe-2/1/0.0;
-    interface xe-3/1/1.0;
-    interface xe-2/1/1.0;
-    interface xe-1/1/1.0;
-    interface ge-0/0/22.0;
-    interface ge-0/0/23.0;
-    interface ge-0/0/21.0;
-    interface ge-0/0/20.0;
 }
 {%- endmacro %}
 
@@ -834,7 +593,7 @@ vlans {
     {% for vln_id in vlans_merged|sort %}
     {{ vlans_merged[vln_id] }} {
         vlan-id {{ vln_id }};
-        {% if vln_id == mgmt_shared.vlan %}
+        {% if vln_id == mgmt_net.vlan %}
         l3-interface vlan.{{ vln_id }};
         {% endif %}
         {% if vlan_units is defined %}

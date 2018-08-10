@@ -1,8 +1,8 @@
 {# makro zum auslesen und mergen der vlan-bereiche in ein einzelnes dict #}
 {% macro merge_vlans(areas, merged) %}
     {% for area in areas %}
-        {% for vln in vlan_areas[area] %}
-            {% set _dummy = merged.update({vln:vlan_areas[area][vln]}) %}
+        {% for vln in vlan_groups[area] %}
+            {% set _dummy = merged.update({vln:vlan_groups[area][vln]}) %}
         {% endfor %}
     {% endfor %}
     {% if vlans_host is defined %}
