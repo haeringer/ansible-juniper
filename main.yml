@@ -1,6 +1,6 @@
 ---
 - import_playbook: _subpb_build-dirs.yml
-- import_playbook: _subpb_int_ex_access.yml
-- import_playbook: _subpb_int_ex_core.yml
-- import_playbook: _subpb_ext_ex_access.yml
+- import_playbook: _subpb_ex_int_access.yml
+- import_playbook: _subpb_ex_int_core.yml
+- import_playbook: _subpb_ex_ext_access.yml
 - import_playbook: _subpb_push-commit.yml

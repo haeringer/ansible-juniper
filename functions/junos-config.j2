@@ -93,8 +93,40 @@ system {
 {############################################################}
 {# chassis config template macro #}
 
-{% macro junos_chassis() -%}
+{% macro junos_chassis_ex_int() -%}
 chassis {
+    {% if virtualchassis is defined %}
+    redundancy {
+        graceful-switchover;
+    }
+    {% endif %}
+    {% set ns = namespace(ae_devices=false,ae_count=0) %}
+    {% for _iface in interfaces if 'ae' in _iface %}
+        {% set ns.ae_count = ns.ae_count + 1 %}
+        {% set ns.ae_devices = true %}
+    {% endfor %}
+    {% if ns.ae_devices == true %}
+    aggregated-devices {
+        ethernet {
+            device-count {{ ns.ae_count }};
+        }
+    }
+    {% endif %}
+    alarm {
+        management-ethernet {
+            link-down ignore;
+        }
+    }
+}
+{%- endmacro %}
+
+{% macro junos_chassis_ex_ext() -%}
+chassis {
+    {% if virtualchassis is defined %}
+    redundancy {
+        graceful-switchover;
+    }
+    {% endif %}
     {% set ns = namespace(ae_devices=false,ae_count=0) %}
     {% for _iface in interfaces if 'ae' in _iface %}
         {% set ns.ae_count = ns.ae_count + 1 %}
@@ -435,7 +467,7 @@ protocols {
 
 {# protocols config template macro ex extern #}
 
-{% macro junos_protocols_ex_e() -%}
+{% macro junos_protocols_ex_ea() -%}
 mstp {
     configuration-name exampleorg-l2core;
     max-hops 128;

@@ -10,4 +10,4 @@
   # Template der jeweiligen Role mit den Variablen aus host_vars und
   # group_vars und generiert daraus die Junos config.
   roles:
-    - int_ex_core
+    - ex_int_core
