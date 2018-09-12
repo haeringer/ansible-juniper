@@ -15,6 +15,9 @@
       - name: Push config to device...
         juniper_junos_config:
           src: '{{ junos_conf }}'
+          # config_mode = private optional angeben, ansonsten default = exclusive
+          # ansible-playbook main.yml -e config_mode=private
+          config_mode: "{{ config_mode if config_mode is defined else omit }}"
           load: 'update'
           timeout: '60'
           # commit vs compare bei ausfuehrung per extra variable (-e) angeben:
