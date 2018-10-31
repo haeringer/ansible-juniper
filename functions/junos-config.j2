@@ -36,7 +36,7 @@ system {
     {% endfor %}
     }
     login {
-		announcement "\n\t####   SYSTEM CONFIG GENERIERT DURCH ANSIBLE   ####\n\n\tManuelle Aenderungen per CLI werden ueberschrieben!\n\n\tInfos zur Konfiguration:\n\thttps://wiki.intern.example.com/x/coAhAQ\n\n\n";
+		announcement "\n\t####   SYSTEM CONFIG GENERIERT DURCH ANSIBLE   ####\n\n\tInfos zur Konfiguration:\n\thttps://wiki.intern.example.com/x/coAhAQ\n\n\n";
 	{% for cls in classes %}
         class {{ cls.name }} {
             permissions [ {% for p in cls.permissions %}{{ p }} {% endfor %}];
