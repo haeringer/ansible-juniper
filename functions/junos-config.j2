@@ -194,7 +194,11 @@ chassis {
         unit 0 {
             family ethernet-switching {
             {% if int.mode is defined %}
+                {% if junos_els is defined and junos_els == true %}
+                interface-mode {{ int.mode }};
+                {% else %}
                 port-mode {{ int.mode }};
+                {% endif %}
             {% endif %}
             {% if int.vlans is defined %}
                 vlan {
@@ -216,6 +220,9 @@ chassis {
             {% endif %}
             {% if int.native is defined %}
                 native-vlan-id {{ int.native }};
+            {% endif %}
+            {% if junos_els is defined and junos_els == true %}
+                storm-control standard;
             {% endif %}
             }
         }
@@ -265,7 +272,11 @@ interfaces {
             family inet6;
         }
     }
+    {% if junos_els is defined and junos_els == true %}
+    irb {
+    {% else %}
     vlan {
+    {% endif %}
         unit {{ mgmt_net.vlan }} {
             description "{{ inventory_hostname }} Mgmt";
             family inet {
@@ -597,9 +608,17 @@ access {
 {%- endmacro %}
 
 {############################################################}
-{# ethernet_switching_options config template macro #}
+{# ethernet_switching_options / forwarding_options (ELS) config template macro #}
 
 {% macro junos_ethernet_switching_options() -%}
+
+{% if junos_els is defined and junos_els == true %}
+forwarding-options {
+    storm-control-profiles standard {
+        all;
+    }
+}
+{% else %}
 ethernet-switching-options {
     storm-control {
         interface all;
@@ -615,6 +634,8 @@ ethernet-switching-options {
         {% endif %}
     {% endfor %}
 }
+{% endif %}
+
 {%- endmacro %}
 
 {############################################################}
@@ -626,7 +647,11 @@ vlans {
     {{ vlans_merged[vln_id] }} {
         vlan-id {{ vln_id }};
         {% if vln_id == mgmt_net.vlan %}
+            {% if junos_els is defined and junos_els == true %}
+        l3-interface irb.{{ vln_id }};
+            {% else %}
         l3-interface vlan.{{ vln_id }};
+            {% endif %}
         {% endif %}
         {% if vlan_units is defined %}
             {% for unit in vlan_units %}
