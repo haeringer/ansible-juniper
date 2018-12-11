@@ -37,7 +37,7 @@ headset=1
     addrset=`cat addr-set.tmp | head -${headset} | tail -1`
     #output
     echo -n "${addrset}: ["
-    cat set_conf.txt | grep -E "(^| )${zone}( |$)" | grep "address-set" | grep -v deactivate | awk '{print $10}' > addr-set-names.tmp
+    cat set_conf.txt | grep -E "(^| )${zone}( |$)" | grep "address-set" | grep -v deactivate | grep -E "(^| )${addrset}( |$)" | awk '{print $10}' > addr-set-names.tmp
     isetnames=`cat addr-set-names.tmp | wc -l`
     headsetnames=1
         while [ ${isetnames} -ge ${headsetnames} ]; do
@@ -106,6 +106,8 @@ headpolicies=1
 echo "policies:"
     while [ ${ipolicies} -ge ${headpolicies} ]; do
         policy=`cat policies.tmp | head -${headpolicies} | tail -1`
+        fromzone=`echo ${policy} | awk '{print $1}'`
+        tozone=`echo ${policy} | awk '{print $3}'`
         #policy-name
         policyname=`echo ${policy} | awk '{print $5}'`
         echo "${policyname}" >> policyname.tmp
@@ -116,6 +118,8 @@ echo "policies:"
                 echo ${policyname} >> testname.tmp
             fi    
         echo "${policyname}:"
+        echo "fromzone: ${fromzone}"
+        echo "tozone: ${tozone}"
         # source-address
         cat set_conf.txt | grep "security policies" | grep "${policy}" | grep source-address | awk '{print $12}' > source.tmp
         isource=`cat source.tmp | wc -l`
@@ -138,10 +142,77 @@ echo "policies:"
                     headsource=`expr ${headsource} + 1`
                     done 
             fi    
+         # destination-address
+        cat set_conf.txt | grep "security policies" | grep "${policy}" | grep destination-address | awk '{print $12}' > destination.tmp
+        idestination=`cat destination.tmp | wc -l`
+            if [ ${idestination} -eq 1 ];then
+                destination=`cat destination.tmp`
+                echo "destination: ${destination}"
+            fi
+            if [ ${idestination} -gt 1 ];then
+               echo -n "destination: ["
+               headdestination=1
+                    while [ ${idestination} -ge ${headdestination} ]; do
+                        destination=`cat destination.tmp | head -${headdestination} | tail -1`
+
+                        if [ ${headdestination} -lt ${idestination} ]; then
+                        echo -n "${destination},"
+                        fi
+                        if [ ${headdestination} -eq ${idestination} ]; then
+                        echo "${destination}]"
+                        fi
+                    headdestination=`expr ${headdestination} + 1`
+                    done
+            fi
+         # application
+        cat set_conf.txt | grep "security policies" | grep "${policy}" | grep application | awk '{print $12}' > application.tmp
+        iapplication=`cat application.tmp | wc -l`
+            if [ ${iapplication} -eq 1 ];then
+                application=`cat application.tmp`
+                echo "application: ${application}"
+            fi
+            if [ ${iapplication} -gt 1 ];then
+               echo -n "application: ["
+               headapplication=1
+                    while [ ${iapplication} -ge ${headapplication} ]; do
+                        application=`cat application.tmp | head -${headapplication} | tail -1`
+
+                        if [ ${headapplication} -lt ${iapplication} ]; then
+                        echo -n "${application},"
+                        fi
+                        if [ ${headapplication} -eq ${iapplication} ]; then
+                        echo "${application}]"
+                        fi
+                    headapplication=`expr ${headapplication} + 1`
+                    done
+            fi 
+                # action
+        cat set_conf.txt | grep "security policies" | grep "${policy}" | grep then | awk '{print $11}' > action.tmp
+        iaction=`cat action.tmp | wc -l`
+            if [ ${iaction} -eq 1 ];then
+                action=`cat action.tmp`
+                echo "action: ${action}"
+            fi
+            if [ ${iaction} -gt 1 ];then
+               echo -n "action: ["
+               headaction=1
+                    while [ ${iaction} -ge ${headaction} ]; do
+                        action=`cat action.tmp | head -${headaction} | tail -1`
+
+                        if [ ${headaction} -lt ${iaction} ]; then
+                        echo -n "${action},"
+                        fi
+                        if [ ${headaction} -eq ${iaction} ]; then
+                        echo "${action}]"
+                        fi
+                    headaction=`expr ${headaction} + 1`
+                    done
+            fi      
         headpolicies=`expr ${headpolicies} + 1`
     done
-#rm -f policyname.tmp
-
+    
+rm -f policyname.tmp
+rm -f testname.tmp
 
 
 
