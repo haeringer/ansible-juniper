@@ -1,0 +1,153 @@
+#! /bin/bash
+
+
+
+cat set_conf.txt | grep "security zones" | awk '{print $5}' | uniq > zones.tmp
+cat zones.tmp 
+
+
+
+i=`cat zones.tmp | wc -l`
+head=1
+#firewallzones
+while [ ${i} -ge ${head} ]; do
+
+zone=`cat zones.tmp | head -${head} | tail -1 `
+cat set_conf.txt | grep -E "(^| )${zone}( |$)" | grep "address-book address" | grep -v "address-set" | grep -v deactivate | awk '{print $8}' > addr-name.tmp
+cat set_conf.txt | grep -E "(^| )${zone}( |$)" | grep "address-book address" | grep -v "address-set" | grep -v deactivate | awk '{print $9}' > addr-ip.tmp
+head=`expr $head + 1`
+#output
+echo "zone: $zone" 
+        iaddr=`cat addr-name.tmp | wc -l`
+        headaddr=1
+        
+        while [ ${iaddr} -ge ${headaddr} ]; do
+        addrname=`cat addr-name.tmp | head -${headaddr} | tail -1`
+        addrip=`cat addr-ip.tmp | head -${headaddr} | tail -1`
+        #output
+        echo "${addrname}: ${addrip}"
+        headaddr=`expr ${headaddr} + 1`
+        done
+
+cat set_conf.txt | grep -E "(^| )${zone}( |$)" | grep "address-set" | grep -v deactivate | awk '{print $8}' | uniq > addr-set.tmp
+iset=`cat addr-set.tmp | wc -l`
+headset=1
+    
+    while [ ${iset} -ge ${headset} ]; do
+    addrset=`cat addr-set.tmp | head -${headset} | tail -1`
+    #output
+    echo -n "${addrset}: ["
+    cat set_conf.txt | grep -E "(^| )${zone}( |$)" | grep "address-set" | grep -v deactivate | awk '{print $10}' > addr-set-names.tmp
+    isetnames=`cat addr-set-names.tmp | wc -l`
+    headsetnames=1
+        while [ ${isetnames} -ge ${headsetnames} ]; do
+        addrsetname=`cat addr-set-names.tmp | head -${headsetnames} | tail -1`
+        
+            if [ ${headsetnames} -lt ${isetnames} ]; then
+            echo -n "${addrsetname},"
+            fi
+            if [ ${headsetnames} -eq ${isetnames} ]; then
+            echo "${addrsetname}]"
+            fi
+        headsetnames=`expr ${headsetnames} + 1`
+        done
+    headset=`expr ${headset} + 1`    
+    done     
+
+done
+
+#applications
+
+cat set_conf.txt | grep applications | grep -v application-set | awk '{print $4}' | uniq >  applications.tmp
+iapp=`cat applications.tmp | wc -l`
+echo "applications:"
+headapp=1
+    while [ ${iapp} -ge ${headapp} ]; do
+    application=`cat applications.tmp | head -${headapp} | tail -1` 
+    port=`cat set_conf.txt | grep applications | grep -v application-set | grep -E "(^| )${application}( |$)" | grep port | awk '{print $6}'`
+    protocol=`cat set_conf.txt | grep applications | grep -v application-set | grep -E "(^| )${application}( |$)" | grep protocol | awk '{print $6}'`
+    echo "${application}"
+    echo "protocol: ${protocol}"
+    echo "port: ${port}"
+    headapp=`expr ${headapp} + 1`
+    done
+
+cat set_conf.txt | grep application-set | awk '{print $4}' | uniq > appsets.tmp
+iappset=`cat appsets.tmp | wc -l`
+headappset=1
+
+    while [ ${iappset} -ge ${headappset} ]; do
+    appset=`cat appsets.tmp | head -${headappset} | tail -1`
+    #output
+    echo -n "${appset}: ["
+    cat set_conf.txt | grep application-set | grep ${appset} | awk '{print $6}' > appsetapps.tmp
+    iappnames=`cat appsetapps.tmp | wc -l`
+    headsetapps=1
+        while [ ${iappnames} -ge ${headsetapps} ]; do
+        appsetname=`cat appsetapps.tmp | head -${headsetapps} | tail -1`
+
+            if [ ${headsetapps} -lt ${iappnames} ]; then
+            echo -n "${appsetname},"
+            fi
+            if [ ${headsetapps} -eq ${iappnames} ]; then
+            echo "${appsetname}]"
+            fi
+        headsetapps=`expr ${headsetapps} + 1`
+        done
+    headappset=`expr ${headappset} + 1`
+    done
+
+
+#firewall-policies
+
+cat set_conf.txt | grep "security policies" | grep -v groups | grep -v traceoptions | grep -v "from-zone untrust to-zone ServerLAN" | grep -v internet-access-office | grep -v default-deny | grep -v chef-to-all | awk '{print $5,$6,$7,$8,$9}' | uniq > policies.tmp
+ipolicies=`cat policies.tmp | wc -l`
+headpolicies=1
+echo "policies:"
+    while [ ${ipolicies} -ge ${headpolicies} ]; do
+        policy=`cat policies.tmp | head -${headpolicies} | tail -1`
+        #policy-name
+        policyname=`echo ${policy} | awk '{print $5}'`
+        echo "${policyname}" >> policyname.tmp
+        testname=`cat policyname.tmp | grep -E "(^| )${policyname}( |$)" | wc -l`
+            if [ ${testname} -gt 1 ];then
+                #testname=`expr ${testname} + 1`
+                policyname=`echo ${policyname}${testname}`
+                echo ${policyname} >> testname.tmp
+            fi    
+        echo "${policyname}:"
+        # source-address
+        cat set_conf.txt | grep "security policies" | grep "${policy}" | grep source-address | awk '{print $12}' > source.tmp
+        isource=`cat source.tmp | wc -l`
+            if [ ${isource} -eq 1 ];then
+                source=`cat source.tmp`
+                echo "source: ${source}"
+            fi
+            if [ ${isource} -gt 1 ];then
+               echo -n "source: ["
+               headsource=1
+                    while [ ${isource} -ge ${headsource} ]; do
+                        source=`cat source.tmp | head -${headsource} | tail -1`
+
+                        if [ ${headsource} -lt ${isource} ]; then
+                        echo -n "${source},"
+                        fi
+                        if [ ${headsource} -eq ${isource} ]; then
+                        echo "${source}]"
+                        fi
+                    headsource=`expr ${headsource} + 1`
+                    done 
+            fi    
+        headpolicies=`expr ${headpolicies} + 1`
+    done
+#rm -f policyname.tmp
+
+
+
+
+
+
+#cat set_conf.txt | grep ${zone} | grep "address-book address" | grep -v "address-set" | grep set | awk '{print $8}' > addr-name.tmp
+#cat set_conf.txt | grep ${zone} | grep "address-book address" | grep -v "address-set" | grep set | awk '{print $9}' > addr-ip.tmp
+
+
