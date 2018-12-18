@@ -1,8 +1,8 @@
 #! /bin/bash
 conf_yml=kami-kaze.yml
+junos_applications=junos_applications
 
-
-
+rm -f ${conf_yml}
 
 
 cat set_conf.txt | grep "security zones" | awk '{print $5}' | uniq > zones.tmp
@@ -57,6 +57,153 @@ echo "zones:" >> ${conf_yml}
 
 done
 
+#default-applications
+
+cat ${junos_applications} | grep -v application-set | awk '{print $6}' | uniq > default-applications.tmp
+idefault=`cat default-applications.tmp | wc -l`
+headdefault=1
+echo "default-applications:" >> ${conf_yml}
+    while [ ${idefault} -ge ${headdefault} ]; do
+         default=`cat default-applications.tmp | head -${headdefault} | tail -1`       
+         headdefault=`expr ${headdefault} + 1 `
+         echo "  ${default}:" >> ${conf_yml}
+      
+
+
+    #default-alg
+        cat junos_applications | grep -E "(^| )${default}( |$)" | grep alg | awk -Falg '{print $2}' | awk '{print $1}' > defaultalg.tmp
+        idefaultalg=`cat defaultalg.tmp | wc -l`
+        if [ ${idefaultalg} -gt 0 ];then
+                if [ ${idefaultalg} -eq 1 ];then
+                    defaultalg=`cat defaultalg.tmp`
+                    echo "    alg: ${defaultalg}" >> ${conf_yml}
+                fi
+                if [ ${idefaultalg} -gt 1 ];then
+                echo -n "    alg: [" >> ${conf_yml}
+                headdefaultalg=1
+                        while [ ${idefaultalg} -ge ${headdefaultalg} ]; do
+                            defaultalg=`cat defaultalg.tmp | head -${headdefaultalg} | tail -1`
+
+                            if [ ${headdefaultalg} -lt ${idefaultalg} ]; then
+                            echo -n "${defaultalg}," >> ${conf_yml}
+                            fi
+                            if [ ${headdefaultalg} -eq ${idefaultalg} ]; then
+                            echo "${defaultalg}]" >> ${conf_yml}
+                            fi
+                        headdefaultalg=`expr ${headdefaultalg} + 1`
+                        done
+                fi
+        fi
+
+
+    #default-protocol
+        cat junos_applications | grep -E "(^| )${default}( |$)" | grep protocol | awk -Fprotocol '{print $2}' | awk '{print $1}' > defaultprotocol.tmp
+        idefaultprotocol=`cat defaultprotocol.tmp | wc -l`
+        if [ ${idefaultprotocol} -gt 0 ];then
+                if [ ${idefaultprotocol} -eq 1 ];then
+                    defaultprotocol=`cat defaultprotocol.tmp`
+                    echo "    protocol: ${defaultprotocol}" >> ${conf_yml}
+                fi
+                if [ ${idefaultprotocol} -gt 1 ];then
+                echo -n "    protocol: [" >> ${conf_yml}
+                headdefaultprotocol=1
+                        while [ ${idefaultprotocol} -ge ${headdefaultprotocol} ]; do
+                            defaultprotocol=`cat defaultprotocol.tmp | head -${headdefaultprotocol} | tail -1`
+
+                            if [ ${headdefaultprotocol} -lt ${idefaultprotocol} ]; then
+                            echo -n "${defaultprotocol}," >> ${conf_yml}
+                            fi
+                            if [ ${headdefaultprotocol} -eq ${idefaultprotocol} ]; then
+                            echo "${defaultprotocol}]" >> ${conf_yml}
+                            fi
+                        headdefaultprotocol=`expr ${headdefaultprotocol} + 1`
+                        done
+                fi
+        fi
+
+
+         
+    #default-source
+        cat junos_applications | grep -E "(^| )${default}( |$)" | grep source-port | awk -Fsource-port '{print $2}' | awk '{print $1}' > defaultsource.tmp
+		idefaultsource=`cat defaultsource.tmp | wc -l`
+		if [ ${idefaultsource} -gt 0 ];then
+				if [ ${idefaultsource} -eq 1 ];then
+					defaultsource=`cat defaultsource.tmp`
+					echo "    source-port: ${defaultsource}" >> ${conf_yml}
+				fi
+				if [ ${idefaultsource} -gt 1 ];then
+				echo -n "    source-port: [" >> ${conf_yml}
+				headdefaultsource=1
+						while [ ${idefaultsource} -ge ${headdefaultsource} ]; do
+							defaultsource=`cat defaultsource.tmp | head -${headdefaultsource} | tail -1`
+
+							if [ ${headdefaultsource} -lt ${idefaultsource} ]; then
+							echo -n "${defaultsource}," >> ${conf_yml}
+							fi
+							if [ ${headdefaultsource} -eq ${idefaultsource} ]; then
+							echo "${defaultsource}]" >> ${conf_yml}
+							fi
+						headdefaultsource=`expr ${headdefaultsource} + 1`
+						done
+				fi
+		fi     
+         
+         
+    #default-destination
+        cat junos_applications | grep -E "(^| )${default}( |$)" | grep destination-port | awk -Fdestination-port '{print $2}' | awk '{print $1}' > defaultdestination.tmp
+		idefaultdestination=`cat defaultdestination.tmp | wc -l`
+		if [ ${idefaultdestination} -gt 0 ];then
+				if [ ${idefaultdestination} -eq 1 ];then
+					defaultdestination=`cat defaultdestination.tmp`
+					echo "    destination-port: ${defaultdestination}" >> ${conf_yml}
+				fi
+				if [ ${idefaultdestination} -gt 1 ];then
+				echo -n "    destination-port: [" >> ${conf_yml}
+				headdefaultdestination=1
+						while [ ${idefaultdestination} -ge ${headdefaultdestination} ]; do
+							defaultdestination=`cat defaultdestination.tmp | head -${headdefaultdestination} | tail -1`
+
+							if [ ${headdefaultdestination} -lt ${idefaultdestination} ]; then
+							echo -n "${defaultdestination}," >> ${conf_yml}
+							fi
+							if [ ${headdefaultdestination} -eq ${idefaultdestination} ]; then
+							echo "${defaultdestination}]" >> ${conf_yml}
+							fi
+						headdefaultdestination=`expr ${headdefaultdestination} + 1`
+						done
+				fi
+		fi         
+            
+    done
+    
+#defauls-application-sets
+
+cat ${junos_applications} | grep application-set | awk '{print $6}' | uniq > defaultappsets.tmp
+idefaultappset=`cat defaultappsets.tmp | wc -l`
+headdefaultappset=1
+echo "default-applicationsets:" >> ${conf_yml}
+    while [ ${idefaultappset} -ge ${headdefaultappset} ]; do
+    defaultappset=`cat defaultappsets.tmp | head -${headdefaultappset} | tail -1`
+    #output
+    echo -n "  ${defaultappset}: [" >> ${conf_yml}
+    cat ${junos_applications} | grep application-set | grep -E "(^| )${defaultappset}( |$)" | awk '{print $8}' > defaultappsetdefaultapps.tmp
+    idefaultappnames=`cat defaultappsetdefaultapps.tmp | wc -l`
+    headsetdefaultapps=1
+        while [ ${idefaultappnames} -ge ${headsetdefaultapps} ]; do
+        defaultappsetname=`cat defaultappsetdefaultapps.tmp | head -${headsetdefaultapps} | tail -1`
+
+            if [ ${headsetdefaultapps} -lt ${idefaultappnames} ]; then
+            echo -n "${defaultappsetname}," >> ${conf_yml}
+            fi
+            if [ ${headsetdefaultapps} -eq ${idefaultappnames} ]; then
+            echo "${defaultappsetname}]" >> ${conf_yml}
+            fi
+        headsetdefaultapps=`expr ${headsetdefaultapps} + 1`
+        done
+    headdefaultappset=`expr ${headdefaultappset} + 1`
+    done
+
+
 #applications
 
 cat set_conf.txt | grep applications | grep -v application-set | awk '{print $4}' | uniq >  applications.tmp
@@ -67,7 +214,7 @@ headapp=1
     application=`cat applications.tmp | head -${headapp} | tail -1` 
     port=`cat set_conf.txt | grep applications | grep -v application-set | grep -E "(^| )${application}( |$)" | grep port | awk '{print $6}'`
     protocol=`cat set_conf.txt | grep applications | grep -v application-set | grep -E "(^| )${application}( |$)" | grep protocol | awk '{print $6}'`
-    echo "  ${application}" >> ${conf_yml}
+    echo "  ${application}:" >> ${conf_yml}
     echo "    protocol: ${protocol}" >> ${conf_yml}
     echo "    port: ${port}" >> ${conf_yml}
     headapp=`expr ${headapp} + 1`
@@ -111,10 +258,9 @@ echo "policies:" >> ${conf_yml}
         tozone=`echo ${policy} | awk '{print $3}'`
         #policy-name
         policyname=`echo ${policy} | awk '{print $5}'`
-        echo "${policyname}" >> policyname.tmp >> ${conf_yml}
+        echo "${policyname}" >> policyname.tmp
         testname=`cat policyname.tmp | grep -E "(^| )${policyname}( |$)" | wc -l`
             if [ ${testname} -gt 1 ];then
-                #testname=`expr ${testname} + 1`
                 policyname=`echo ${policyname}${testname}`
                 echo ${policyname} >> testname.tmp
             fi    
@@ -214,7 +360,7 @@ echo "policies:" >> ${conf_yml}
     
 rm -f policyname.tmp
 rm -f testname.tmp
-
+rm -f *.tmp
 
 
 
