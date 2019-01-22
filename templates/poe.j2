@@ -1,0 +1,17 @@
+{# poe config template macro #}
+
+{% macro junos_general() -%}
+poe {
+    interface all;
+    {% if poe is defined %}
+        {% if poe.static == true %}
+    management static;
+            {% for iface in interfaces %}
+    interface {{ iface }} {
+        maximum-power {{ poe.interface_max_power }};
+    }
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+}
+{%- endmacro %}

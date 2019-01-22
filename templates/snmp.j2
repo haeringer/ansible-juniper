@@ -1,0 +1,29 @@
+{# snmp config template macro #}
+
+{% macro junos_general() -%}
+snmp {
+    location "{{ location }}";
+    contact "{{ snmp.contact }}";
+    community {{ snmp.community }} {
+        authorization read-only;
+    }
+    trap-group default {
+        categories {
+            authentication;
+            chassis;
+            link;
+            remote-operations;
+            routing;
+            startup;
+            rmon-alarm;
+            vrrp-events;
+            configuration;
+        }
+        targets {
+        {% for snmpsrv in snmp.servers %}
+            {{ snmpsrv }};
+        {% endfor %}
+        }
+    }
+}
+{%- endmacro %}

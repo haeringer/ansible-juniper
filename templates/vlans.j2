@@ -1,0 +1,35 @@
+{# helper-macro zum mergen der vlans aufrufen #}
+{% import 'functions/helpers.j2' as helpers with context %}
+{% set vlans_merged = ({}) %}
+{% if group is defined %}
+{{ helpers.merge_vlans(group.vlan_groups, vlans_merged) }}
+{% endif %}
+
+
+
+{############################################################}
+{# vlans config template macro #}
+
+{% macro junos_general() -%}
+vlans {
+    {% for vln_id in vlans_merged|sort %}
+    {{ vlans_merged[vln_id] }} {
+        vlan-id {{ vln_id }};
+        {% if vln_id == mgmt_net.vlan %}
+            {% if junos_els is defined and junos_els == true %}
+        l3-interface irb.{{ vln_id }};
+            {% else %}
+        l3-interface vlan.{{ vln_id }};
+            {% endif %}
+        {% endif %}
+        {% if vlan_units is defined %}
+            {% for unit in vlan_units %}
+                {% if vln_id == unit %}
+        l3-interface vlan.{{ vln_id }};
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    }
+    {% endfor %}
+}
+{%- endmacro %}

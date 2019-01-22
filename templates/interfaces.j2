@@ -1,0 +1,177 @@
+{# helper-macro zum mergen der vlans aufrufen #}
+{% import 'functions/helpers.j2' as helpers with context %}
+{% set vlans_merged = ({}) %}
+{% if group is defined %}
+{{ helpers.merge_vlans(group.vlan_groups, vlans_merged) }}
+{% endif %}
+
+
+
+{############################################################}
+{# 'sub-macro' fuer interface unit config, verwendet in interfaces und interface ranges #}
+
+{% macro int_unit(int, int_name) -%}
+    {% if int.desc is defined %}
+    description "{{ int.desc }}";
+    {% endif %}
+    {% if int.disable is defined and int.disable == true %}
+        disable;
+    {% endif %}
+    {% if int.mtu is defined %}
+        mtu {{ int.mtu }};
+    {% endif %}
+    {% if int.etheroptions is defined %}
+        ether-options {
+        {% if int.etheroptions.lacp_interface is defined %}
+            802.3ad {{ int.etheroptions.lacp_interface }};
+        {% endif %}
+        {% if int.etheroptions.no_autoneg is defined and int.etheroptions.no_autoneg == true %}
+            no-auto-negotiation;
+        {% endif %}
+        {% if int.etheroptions.duplex is defined and int.etheroptions.duplex == 'full' %}
+            link-mode full-duplex;
+        {% elif int.etheroptions.duplex is defined and int.etheroptions.duplex == 'half' %}
+            no-flow-control;
+            link-mode half-duplex;
+        {% endif %}
+        {% if int.etheroptions.speed is defined %}
+            speed {
+                {{ int.etheroptions.speed }};
+            }
+        {% endif %}
+        }
+    {% endif %}
+    {% if 'ae' in int_name %}
+        aggregated-ether-options {
+            lacp {
+                active;
+            }
+        }
+    {% endif %}
+    {% if (int.mode is defined or
+           int.vlans is defined or
+           int.vlan_groups is defined) %}
+        unit 0 {
+            family ethernet-switching {
+            {% if int.mode is defined %}
+                {% if junos_els is defined and junos_els == true %}
+                interface-mode {{ int.mode }};
+                {% else %}
+                port-mode {{ int.mode }};
+                {% endif %}
+            {% endif %}
+            {% if int.vlans is defined %}
+                vlan {
+                    members{{' '}}
+                {%- if int.vlans == 'all' -%}
+                    all;
+                {% elif int.vlans is number -%}
+                    {{ vlans_merged[int.vlans] }};
+                {% elif int.vlans is sequence -%}
+                    [ {% for vln in int.vlans|sort %}{{ vlans_merged[vln] }} {% endfor %}];
+                {% endif %}
+                }
+            {% elif int.vlan_groups is defined %}
+            {% set int_vlans_merged = ({}) %}
+            {{ helpers.merge_vlans(int.vlan_groups, int_vlans_merged) }}
+                vlan {
+                    members [ {% for vlns in int_vlans_merged|sort %}{{ int_vlans_merged[vlns] }} {% endfor %}];
+                }
+            {% endif %}
+            {% if int.native is defined %}
+                native-vlan-id {{ int.native }};
+            {% endif %}
+            {% if junos_els is defined and junos_els == true %}
+                storm-control standard;
+            {% endif %}
+            }
+        }
+    {%- endif %}
+{%- endmacro %}
+
+{# interfaces config template macro #}
+
+{% macro junos_general() -%}
+interfaces {
+    {% for _ifrange in if_ranges|sort %}
+    {% set ifrange = if_ranges[_ifrange] %}
+    interface-range {{ _ifrange }} {
+        {% if ifrange.member_ranges is defined %}
+            {% if ifrange.member_ranges is string %}
+        member-range {{ ifrange.member_ranges }};
+            {% elif ifrange.member_ranges is sequence %}
+                {% for rng in ifrange.member_ranges %}
+        member-range {{ rng }};
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+        {% if ifrange.members is defined %}
+            {% if ifrange.members is string %}
+        member {{ ifrange.members }};
+            {% elif ifrange.members is sequence %}
+                {% for intf in ifrange.members %}
+        member {{ intf }};
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    {{ int_unit(ifrange, _ifrange) }}
+    }
+    {% endfor %}
+    {% for _iface in interfaces|sort %}
+    {% set iface = interfaces[_iface] %}
+    {{ _iface }} {
+    {{ int_unit(iface, _iface) }}
+    }
+    {% endfor %}
+    me0 {
+        unit 0 {
+            description "{{ inventory_hostname }} local OOB Mgmt";
+            family inet {
+                address 169.254.1.1/16;
+            }
+            family inet6;
+        }
+    }
+    {% if junos_els is defined and junos_els == true %}
+    irb {
+    {% else %}
+    vlan {
+    {% endif %}
+        unit {{ mgmt_net.vlan }} {
+            description "{{ inventory_hostname }} Mgmt";
+            family inet {
+                address {{ mgmt_host.v4_addr }}/24;
+            }
+            family inet6 {
+                address {{ mgmt_host.v6_addr }}/64;
+            }
+        }
+    {% if vlan_units is defined %}
+        {% for _unit in vlan_units %}
+        {% set unit = vlan_units[_unit] %}
+        unit {{ _unit }} {
+            {% if unit.desc is defined %}
+            description "{{ unit.desc }}";
+            {% endif %}
+            {% if unit.v4 is defined %}
+            family inet {
+                {% for _addr in unit.v4.addr %}
+                {% set addr = unit.v4[_addr] %}
+                address {{ _addr }};
+                {% endfor %}
+            }
+            {% endif %}
+            {% if unit.v6 is defined %}
+            family inet6 {
+                {% for _addr in unit.v6.addr %}
+                {% set addr = unit.v6[_addr] %}
+                address {{ _addr }};
+                {% endfor %}
+            }
+            {% endif %}
+        }
+        {% endfor %}
+    {% endif %}
+    }
+}
+{%- endmacro %}

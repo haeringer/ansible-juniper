@@ -1,0 +1,83 @@
+{# system config template macro #}
+
+{% macro junos_general() -%}
+/* Config generiert durch Ansible */
+system {
+    host-name {{ inventory_hostname }};
+    domain-name {{ domain_name }};
+    time-zone {{ time_zone }};
+    no-redirects;
+    authentication-order [ tacplus password ];
+    root-authentication {
+        encrypted-password "{{ root_password }}"; ## SECRET-DATA
+    }
+    name-server {
+    {% for namesrv in dns.servers %}
+        {{ namesrv }};
+    {% endfor %}
+    }
+    tacplus-server {
+    {% for tacsrv in tacacs.servers %}
+        {{ tacsrv.ip }} {
+            port 49;
+            secret "{{ tacsrv.secret }}"; ## SECRET-DATA
+            timeout 10;
+            single-connection;
+            source-address {{ mgmt_host.v4_addr }};
+        }
+    {% endfor %}
+    }
+    login {
+		announcement "\n\t####   SYSTEM CONFIG GENERIERT DURCH ANSIBLE   ####\n\n\tInfos zur Konfiguration:\n\thttps://wiki.intern.example.com/x/coAhAQ\n\n\n";
+	{% for cls in classes %}
+        class {{ cls.name }} {
+            permissions [ {% for p in cls.permissions %}{{ p }} {% endfor %}];
+        }
+    {% endfor %}
+    {% for usr in users %}
+        user {{ usr.name }} {
+            class {{ usr.class }};
+            {% if usr.passwd is defined %}
+            authentication {
+                encrypted-password "{{ usr.passwd }}"; ## SECRET-DATA
+            }
+            {% elif usr.ssh_key is defined %}
+            authentication {
+                ssh-rsa "{{ usr.ssh_key }}"; ## SECRET-DATA
+            }
+            {% endif %}
+        }
+    {% endfor %}
+    }
+    services {
+        ssh {
+            root-login deny;
+            protocol-version v2;
+            rate-limit 10;
+        }
+        netconf {
+            ssh;
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+    {% if virtualchassis is defined %}
+    commit synchronize;
+    {% endif %}
+    ntp {
+    {% for ntpsrv in ntp.servers %}
+        server {{ ntpsrv }};
+    {% endfor %}
+    }
+}
+{%- endmacro %}

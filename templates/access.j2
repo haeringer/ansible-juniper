@@ -1,0 +1,21 @@
+{# access config template macro #}
+
+{% macro junos_general() -%}
+{% if dot1x is defined and dot1x == true %}
+access {
+    radius-server {
+    {% for radiussrv in radius.servers %}
+        {{ radiussrv.ip }} secret "{{ radiussrv.secret }}"; ## SECRET-DATA
+    {% endfor %}
+    }
+    profile PNAC1 {
+        authentication-order radius;
+        radius {
+            authentication-server {% if radius.servers|length < 2 %}{{ radius.servers[0].ip }};
+            {% else %}[ {% for radiussrv in radius.servers %}{{ radiussrv.ip }} {% endfor %}];
+            {% endif %}
+        }
+    }
+}
+{% endif -%}
+{%- endmacro %}

@@ -1,15 +1,23 @@
 #jinja2:lstrip_blocks: True
 
-{%- import 'functions/junos-config.j2' as config with context -%}
+{%- import 'templates/system.j2' as _system with context -%}
+{%- import 'templates/chassis.j2' as _chassis with context -%}
+{%- import 'templates/interfaces.j2' as _interfaces with context -%}
+{%- import 'templates/forwarding-options.j2' as _forwarding_options with context -%}
+{%- import 'templates/snmp.j2' as _snmp with context -%}
+{%- import 'templates/access.j2' as _access with context -%}
+{%- import 'templates/vlans.j2' as _vlans with context -%}
+{%- import 'templates/protocols.j2' as _protocols with context -%}
+{%- import 'templates/routing-options.j2' as _routing_options with context -%}
+
 
 {# config-template macros #}
-{{ config.junos_system() }}
-{{ config.junos_chassis_ex_int() }}
-{{ config.junos_interfaces() }}
-{{ config.junos_snmp() }}
-{{ config.junos_routing_options() }}
-{{ config.junos_protocols_ex_ia() }}
-{{ config.junos_access() }}
-{{ config.junos_ethernet_switching_options() }}
-{{ config.junos_vlans() }}
-{{ config.junos_poe() }}
+{{ _system.junos_general() }}
+{{ _chassis.junos_ex_int() }}
+{{ _interfaces.junos_general() }}
+{{ _forwarding_options.junos_general() }}
+{{ _snmp.junos_general() }}
+{{ _access.junos_general() }}
+{{ _vlans.junos_general() }}
+{{ _protocols.junos_ex_ia() }}
+{{ _routing_options.junos_general() }}
