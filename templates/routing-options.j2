@@ -4,11 +4,11 @@
 routing-options {
     rib inet6.0 {
         static {
-            route ::/0 next-hop {{ mgmt_net.v6_defaultgw }};
+            route ::/0 next-hop {{ routing.v6_defaultgw }};
         }
     }
     static {
-        route 0.0.0.0/0 next-hop {{ mgmt_net.v4_defaultgw }};
+        route 0.0.0.0/0 next-hop {{ routing.v4_defaultgw }};
     }
 }
 {%- endmacro %}

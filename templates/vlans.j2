@@ -15,7 +15,7 @@ vlans {
     {% for vln_id in vlans_merged|sort %}
     {{ vlans_merged[vln_id] }} {
         vlan-id {{ vln_id }};
-        {% if vln_id == mgmt_net.vlan %}
+        {% if vln_id == mgmt_vlan %}
             {% if junos_els is defined and junos_els == true %}
         l3-interface irb.{{ vln_id }};
             {% else %}
