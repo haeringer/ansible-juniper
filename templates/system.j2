@@ -23,7 +23,6 @@ system {
             secret "{{ tacsrv.secret }}"; ## SECRET-DATA
             timeout 10;
             single-connection;
-            source-address {{ mgmt_host.v4_addr }};
         }
     {% endfor %}
     }

@@ -7,7 +7,6 @@
 
 
 
-{############################################################}
 {# vlans config template macro #}
 
 {% macro junos_general() -%}
@@ -15,17 +14,14 @@ vlans {
     {% for vln_id in vlans_merged|sort %}
     {{ vlans_merged[vln_id] }} {
         vlan-id {{ vln_id }};
-        {% if vln_id == mgmt_vlan %}
-            {% if junos_els is defined and junos_els == true %}
-        l3-interface irb.{{ vln_id }};
-            {% else %}
-        l3-interface vlan.{{ vln_id }};
-            {% endif %}
-        {% endif %}
         {% if vlan_units is defined %}
             {% for unit in vlan_units %}
                 {% if vln_id == unit %}
+                    {% if junos_els is defined and junos_els == true %}
+        l3-interface irb.{{ vln_id }};
+                    {% else %}
         l3-interface vlan.{{ vln_id }};
+                    {% endif %}
                 {% endif %}
             {% endfor %}
         {% endif %}
