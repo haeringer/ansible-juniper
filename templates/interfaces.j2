@@ -104,7 +104,14 @@ interfaces {
     {% endif -%}
 
     {% if _p.etheroptions is defined %}
+        {% if device_type == 'srx' or device_type == 'mx' %}
+        gigether-options {
+        {% else %}
         ether-options {
+        {% endif %}
+        {% if _p.etheroptions.redundant_parent is defined %}
+            redundant-parent {{ _p.etheroptions.redundant_parent }};
+        {% endif %}
         {% if _p.etheroptions.lacp_interface is defined %}
             802.3ad {{ _p.etheroptions.lacp_interface }};
         {% endif %}
