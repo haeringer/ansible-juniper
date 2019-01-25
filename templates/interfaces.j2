@@ -37,7 +37,7 @@ interfaces {
     {{ subtemplate_int(ir, ifrange_name, false) }}
     }
     {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% for interface_name in interfaces|sort %}
 {% set _int = interfaces[interface_name] %}
@@ -53,7 +53,7 @@ interfaces {
         {{ subtemplate_int(_int, interface_name, false) }}
     {% endif %}
     }
-{% endfor %}
+{% endfor -%}
 
 {% if no_mgmt_int is not defined %}
     me0 {
@@ -65,7 +65,7 @@ interfaces {
             family inet6;
         }
     }
-{% endif %}
+{% endif -%}
 
 {% if vlan_units is defined %}
     {% if junos_els is defined and junos_els == true %}
@@ -79,7 +79,7 @@ interfaces {
         {{ subtemplate_int(vu, vlan_unit_name, true) }}
     {% endfor %}
     }
-{% endif %}
+{% endif -%}
 
 }
 {%- endmacro %}
@@ -89,19 +89,19 @@ interfaces {
 {# 'sub-template' fuer interface config, verwendet in interfaces und interface ranges #}
 {# _p = parent  #}
 
-{% macro subtemplate_int(_p, _p_name, unit) -%}
+{% macro subtemplate_int(_p, _p_name, unit) %}
 
     {% if _p.desc is defined and unit == false %}
         description "{{ _p.desc }}";
-    {% endif %}
+    {% endif -%}
 
     {% if _p.disable is defined and _p.disable == true %}
         disable;
-    {% endif %}
+    {% endif -%}
 
     {% if _p.mtu is defined %}
         mtu {{ _p.mtu }};
-    {% endif %}
+    {% endif -%}
 
     {% if _p.etheroptions is defined %}
         ether-options {
@@ -123,7 +123,7 @@ interfaces {
             }
         {% endif %}
         }
-    {% endif %}
+    {% endif -%}
 
     {% if _p_name is not number and 'ae' in _p_name %}
         aggregated-ether-options {
@@ -131,7 +131,7 @@ interfaces {
                 active;
             }
         }
-    {% endif %}
+    {% endif -%}
 
     {% if (_p.mode is defined or
            _p.vlans is defined or
@@ -171,7 +171,7 @@ interfaces {
             {% endif %}
             }
         }
-    {%- endif %}
+    {%- endif -%}
 
     {% if _p.ipv4 is defined or _p.ipv6 is defined %}
         {% if unit == false %}
@@ -179,7 +179,7 @@ interfaces {
         {% elif unit == true %}
         unit {{ _p_name }} {
         {% endif %}
-        {% if _p.desc is defined %}
+        {% if _p.desc is defined and unit == true %}
             description "{{ _p.desc }}";
         {% endif %}
         {% if _p.ipv4 is defined %}
@@ -197,6 +197,6 @@ interfaces {
             }
         {% endif %}
         }
-    {% endif %}
+    {% endif -%}
 
 {%- endmacro %}
