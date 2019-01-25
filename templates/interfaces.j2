@@ -86,7 +86,7 @@ interfaces {
 
 
 
-{# 'sub-template' fuer interface config, verwendet in interfaces und interface ranges #}
+{# sub template fuer interface config #}
 {# _p = parent  #}
 
 {% macro subtemplate_int(_p, _p_name, unit) %}
@@ -184,16 +184,24 @@ interfaces {
         {% endif %}
         {% if _p.ipv4 is defined %}
             family inet {
-            {% for address_value in _p.ipv4.addr %}
+            {% if _p.ipv4.addr is mapping %}
+                {% for address_value in _p.ipv4.addr %}
                 address {{ address_value }};
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                address {{ _p.ipv4.addr }};
+            {% endif %}
             }
         {% endif %}
         {% if _p.ipv6 is defined %}
             family inet6 {
-            {% for address_value in _p.ipv6.addr %}
+            {% if _p.ipv6.addr is mapping %}
+                {% for address_value in _p.ipv6.addr %}
                 address {{ address_value }};
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                address {{ _p.ipv6.addr }};
+            {% endif %}
             }
         {% endif %}
         }
