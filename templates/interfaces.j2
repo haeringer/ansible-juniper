@@ -34,7 +34,7 @@ interfaces {
             {% endif %}
         {% endif %}
     {# call interface sub template #}
-    {{ subtemplate_int(ir, ifrange_name, false) }}
+    {{ subtemplate_int(ir, ifrange_name, false, none) }}
     }
     {% endfor %}
 {% endif -%}
@@ -42,15 +42,14 @@ interfaces {
 {% for interface_name in interfaces|sort %}
 {% set _int = interfaces[interface_name] %}
     {{ interface_name }} {
-    {% if units is defined %}
-        {% for unit_name in units %}
-        {% set unit = units[unit_name] %}
+    {# call interface sub template #}
+    {{ subtemplate_int(_int, interface_name, false, none) -}}
+    {% if _int.units is defined %}
+        {% for unit_name in _int.units %}
+        {% set unit = _int.units[unit_name] %}
         {# call interface sub template #}
-        {{ subtemplate_int(unit, unit_name, true) }}
+        {{ subtemplate_int(unit, unit_name, true, _int) -}}
         {% endfor %}
-    {% else %}
-        {# call interface sub template #}
-        {{ subtemplate_int(_int, interface_name, false) }}
     {% endif %}
     }
 {% endfor -%}
@@ -76,7 +75,7 @@ interfaces {
     {% for vlan_unit_name in vlan_units|sort %}
     {% set vu = vlan_units[vlan_unit_name] %}
         {# call interface sub template #}
-        {{ subtemplate_int(vu, vlan_unit_name, true) }}
+        {{ subtemplate_int(vu, vlan_unit_name, true, none) -}}
     {% endfor %}
     }
 {% endif -%}
@@ -87,52 +86,73 @@ interfaces {
 
 
 {# sub template fuer interface config #}
-{# _p = parent  #}
 
-{% macro subtemplate_int(_p, _p_name, unit) %}
+{% macro subtemplate_int(_i, _i_name, unit, parent) %}
 
-    {% if _p.desc is defined and unit == false %}
-        description "{{ _p.desc }}";
+    {% if _i.desc is defined and unit == false %}
+        description "{{ _i.desc }}";
     {% endif -%}
 
-    {% if _p.disable is defined and _p.disable == true %}
+    {% if _i.disable is defined and _i.disable == true %}
         disable;
     {% endif -%}
 
-    {% if _p.mtu is defined %}
-        mtu {{ _p.mtu }};
+    {% if _i.mtu is defined %}
+        mtu {{ _i.mtu }};
     {% endif -%}
 
-    {% if _p.etheroptions is defined %}
-        {% if device_type == 'srx' or device_type == 'mx' %}
+    {% if _i.vlan_tagging is defined and _i.vlan_tagging == true %}
+        vlan-tagging;
+    {% endif -%}
+
+    {% if _i.etheroptions is defined %}
+        {% if device_type is defined %}
+            {% if device_type == ('srx' or 'mx') %}
         gigether-options {
+            {% endif %}
         {% else %}
         ether-options {
         {% endif %}
-        {% if _p.etheroptions.redundant_parent is defined %}
-            redundant-parent {{ _p.etheroptions.redundant_parent }};
+        {% if _i.etheroptions.redundant_parent is defined %}
+            redundant-parent {{ _i.etheroptions.redundant_parent }};
         {% endif %}
-        {% if _p.etheroptions.lacp_interface is defined %}
-            802.3ad {{ _p.etheroptions.lacp_interface }};
+        {% if _i.etheroptions.lacp_interface is defined %}
+            802.3ad {{ _i.etheroptions.lacp_interface }};
         {% endif %}
-        {% if _p.etheroptions.no_autoneg is defined and _p.etheroptions.no_autoneg == true %}
+        {% if _i.etheroptions.no_autoneg is defined and _i.etheroptions.no_autoneg == true %}
             no-auto-negotiation;
         {% endif %}
-        {% if _p.etheroptions.duplex is defined and _p.etheroptions.duplex == 'full' %}
+        {% if _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'full' %}
             link-mode full-duplex;
-        {% elif _p.etheroptions.duplex is defined and _p.etheroptions.duplex == 'half' %}
+        {% elif _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'half' %}
             no-flow-control;
             link-mode half-duplex;
         {% endif %}
-        {% if _p.etheroptions.speed is defined %}
+        {% if _i.etheroptions.speed is defined %}
             speed {
-                {{ _p.etheroptions.speed }};
+                {{ _i.etheroptions.speed }};
             }
         {% endif %}
         }
     {% endif -%}
 
-    {% if _p_name is not number and 'ae' in _p_name %}
+    {% if _i.fabricoptions is defined %}
+        fabric-options {
+        {% if _i.fabricoptions.members is defined %}
+            member-interfaces {
+                {% for i in _i.fabricoptions.members %}
+                {{ i }};
+                {% endfor %}
+            }
+        {% endif %}
+        }
+    {% endif -%}
+
+    {% if _i.redundancy_group is defined %}
+        redundancy-group {{ _i.redundancy_group }};
+    {% endif -%}
+
+    {% if _i_name is not number and 'ae' in _i_name %}
         aggregated-ether-options {
             lacp {
                 active;
@@ -140,78 +160,98 @@ interfaces {
         }
     {% endif -%}
 
-    {% if (_p.mode is defined or
-           _p.vlans is defined or
-           _p.vlan_groups is defined) %}
+    {% if (_i.mode is defined or
+           _i.vlans is defined or
+           _i.vlan_groups is defined) %}
         unit 0 {
             family ethernet-switching {
-            {% if _p.mode is defined %}
+            {% if _i.mode is defined %}
                 {% if junos_els is defined and junos_els == true %}
-                interface-mode {{ _p.mode }};
+                interface-mode {{ _i.mode }};
                 {% else %}
-                port-mode {{ _p.mode }};
+                port-mode {{ _i.mode }};
                 {% endif %}
             {% endif %}
-            {% if _p.vlans is defined %}
+            {% if _i.vlans is defined %}
                 vlan {
                     members{{' '}}
-                {%- if _p.vlans == 'all' -%}
+                {%- if _i.vlans == 'all' -%}
                     all;
-                {% elif _p.vlans is number -%}
-                    {{ vlans_merged[_p.vlans] }};
-                {% elif _p.vlans is sequence -%}
-                    [ {% for vln in _p.vlans|sort %}{{ vlans_merged[vln] }} {% endfor %}];
+                {% elif _i.vlans is number -%}
+                    {{ vlans_merged[_i.vlans] }};
+                {% elif _i.vlans is sequence -%}
+                    [ {% for vln in _i.vlans|sort %}{{ vlans_merged[vln] }} {% endfor %}];
                 {% endif %}
                 }
-            {% elif _p.vlan_groups is defined %}
+            {% elif _i.vlan_groups is defined %}
             {% set int_vlans_merged = ({}) %}
-            {{ helpers.merge_vlans(_p.vlan_groups, int_vlans_merged) }}
+            {{ helpers.merge_vlans(_i.vlan_groups, int_vlans_merged) }}
                 vlan {
                     members [ {% for vlns in int_vlans_merged|sort %}{{ int_vlans_merged[vlns] }} {% endfor %}];
                 }
             {% endif %}
-            {% if _p.native is defined %}
-                native-vlan-id {{ _p.native }};
+            {% if _i.native is defined %}
+                native-vlan-id {{ _i.native }};
             {% endif %}
             {% if junos_els is defined and junos_els == true %}
                 storm-control standard;
             {% endif %}
             }
         }
-    {%- endif -%}
+    {% endif -%}
 
-    {% if _p.ipv4 is defined or _p.ipv6 is defined %}
+    {% if _i.ipv4 is defined or _i.ipv6 is defined %}
         {% if unit == false %}
         unit 0 {
         {% elif unit == true %}
-        unit {{ _p_name }} {
+        unit {{ _i_name }} {
         {% endif %}
-        {% if _p.desc is defined and unit == true %}
-            description "{{ _p.desc }}";
+        {% if _i.desc is defined and unit == true %}
+            description "{{ _i.desc }}";
         {% endif %}
-        {% if _p.ipv4 is defined %}
+        {% if parent.vlan_tagging is defined and parent.vlan_tagging == true %}
+            vlan-id {{ _i_name }};
+        {% endif %}
+        {% if _i.ipv4 is defined %}
             family inet {
-            {% if _p.ipv4.addr is mapping %}
-                {% for address_value in _p.ipv4.addr %}
-                address {{ address_value }};
-                {% endfor %}
-            {% else %}
-                address {{ _p.ipv4.addr }};
-            {% endif %}
+            {%- for _adr in _i.ipv4 %}
+                {{ subtemplate_ip(_adr) -}}
+            {% endfor %}
             }
         {% endif %}
-        {% if _p.ipv6 is defined %}
+        {% if _i.ipv6 is defined %}
             family inet6 {
-            {% if _p.ipv6.addr is mapping %}
-                {% for address_value in _p.ipv6.addr %}
-                address {{ address_value }};
-                {% endfor %}
-            {% else %}
-                address {{ _p.ipv6.addr }};
-            {% endif %}
+            {%- for _adr in _i.ipv6 %}
+                {{ subtemplate_ip(_adr) -}}
+            {% endfor %}
             }
         {% endif %}
         }
     {% endif -%}
 
+{%- endmacro %}
+
+
+{# sub template fuer ip config (v4 + v6) #}
+
+{% macro subtemplate_ip(_a) %}
+
+{% if _a.type is defined or _a.static_arp is defined %}
+                address {{ _a.addr }} {
+    {% if _a.type is defined and _a.type is string %}
+                    {{ _a.type }};
+    {% elif _a.type is defined and _a.type is sequence %}
+        {% for _t in _a.type %}
+                    {{ _t }};
+        {% endfor %}
+    {% endif %}
+    {% if _a.static_arp is defined %}
+        {% for _e in _a.static_arp %}
+                    arp {{ _e }} mac {{ _a.static_arp[_e] }};
+        {% endfor %}
+    {% endif %}
+                }
+{% else %}
+                address {{ _a.addr }};
+{% endif %}
 {%- endmacro %}
