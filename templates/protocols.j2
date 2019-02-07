@@ -119,6 +119,9 @@ protocols {
         collector {{ sflow.collector_ip }} {
             udp-port {{ export_sflow.collector_port }};
         }
+        {% if export_sflow.interface_range is defined %}
+        interfaces {{ export_sflow.interface_range }};
+        {% endif %}
         {% for _iface in interfaces %}
         {% set iface = interfaces[_iface] %}
             {% if (iface.sflow is defined and iface.sflow == true) %}
