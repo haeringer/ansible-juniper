@@ -107,7 +107,7 @@ protocols {
         interface downlinks;
         interface xlinks;
     }
-    {% if export_sflow is defined and export_sflow == true %}
+    {% if export_sflow is defined %}
     sflow {
         agent-id {{ mgmt_ip }};
         polling-interval {{ sflow.polling_interval }};
@@ -117,7 +117,7 @@ protocols {
         }
         source-ip {{ mgmt_ip }};
         collector {{ sflow.collector_ip }} {
-            udp-port {{ sflow.collector_port }};
+            udp-port {{ export_sflow.collector_port }};
         }
         {% for _iface in interfaces %}
         {% set iface = interfaces[_iface] %}
