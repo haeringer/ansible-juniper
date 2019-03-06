@@ -105,6 +105,12 @@ interfaces {
         vlan-tagging;
     {% endif -%}
 
+    {% if _i.native is defined %}
+        {% if junos_els is defined and junos_els == true %}
+        native-vlan-id {{ _i.native }};
+        {% endif %}
+    {% endif %}
+
     {% if _i.etheroptions is defined %}
         {% if device_type is defined %}
             {% if device_type == ('srx' or 'mx') %}
@@ -180,7 +186,10 @@ interfaces {
                 {% elif _i.vlans is number -%}
                     {{ vlans_merged[_i.vlans] }};
                 {% elif _i.vlans is sequence -%}
-                    [ {% for vln in _i.vlans|sort %}{{ vlans_merged[vln] }} {% endfor %}];
+                    [ {% for vln in _i.vlans|sort %}{{ vlans_merged[vln] }} {% endfor %}
+                        {% if _i.native is defined %}
+                          {% if junos_els is defined and junos_els == true %}{{ _i.native }}{% endif %}
+                        {% endif %}];
                 {% endif %}
                 }
             {% elif _i.vlan_groups is defined %}
@@ -191,7 +200,11 @@ interfaces {
                 }
             {% endif %}
             {% if _i.native is defined %}
+                {% if junos_els is defined and junos_els == true %}
+                    {# do nothing here; simpler than testing negative conditions #}
+                {% else %}
                 native-vlan-id {{ _i.native }};
+                {% endif %}
             {% endif %}
             {% if junos_els is defined and junos_els == true %}
                 storm-control standard;
