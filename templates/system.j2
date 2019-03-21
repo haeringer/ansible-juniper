@@ -4,6 +4,9 @@
 /* Config generiert durch Ansible */
 system {
     host-name {{ inventory_hostname }};
+    {% if junos_els is defined and junos_els == true %}
+    auto-snapshot;
+    {% endif %}
     domain-name {{ domain_name }};
     time-zone {{ time_zone }};
     no-redirects;
