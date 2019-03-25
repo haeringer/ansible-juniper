@@ -1,0 +1,17 @@
+{# chassis config template macro #}
+
+{% macro junos_general() -%}
+{% if virtualchassis is defined %}
+virtual-chassis {
+    preprovisioned;
+    no-split-detection;
+    {% for member_name in virtualchassis.members %}
+    {% set _member = virtualchassis.members[member_name] %}
+    member {{ member_name }} {
+        role {{ _member.role }};
+        serial-number {{ _member.serial }};
+    }
+    {% endfor %}
+}
+{% endif %}
+{%- endmacro %}
