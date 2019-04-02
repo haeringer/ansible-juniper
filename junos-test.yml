@@ -12,20 +12,13 @@
         port: 830
         timeout: 5
 
-    - name: Retrieve Junos version via junos_facts module
-      junos_facts:
-      register: junosfacts
-    - name: junos_facts Output...
-      debug:
-        msg: "Junos version: {{ ansible_net_version }}"
-    
     - name: Retrieve Junos version via juniper_junos_command module
       juniper_junos_command:
         commands:
           - "show version"
       register: juniperjunoscommand
     - name: juniper_junos_command Output...
-      debug: 
+      debug:
         var: juniperjunoscommand.stdout_lines[5]
 
     - name: Retrieve Junos version via juniper_junos_rpc module
