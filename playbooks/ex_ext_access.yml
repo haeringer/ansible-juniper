@@ -1,0 +1,14 @@
+---
+- name: '### JUNIPER EX EXTERN ACCESS ###'
+  hosts: ext_ex_access
+  tasks:
+
+  - import_role:
+      name: build-cfg_ex_ext_access
+    connection: local
+    tags: [build-config, push-config]
+
+  - import_role:
+      name: push-config
+    when: push == 'true' or push is not defined
+    tags: push-config

@@ -1,3 +1,3 @@
 ---
-- name: build config
+- name: 'Generate Junos Configuration'
   local_action: template src=main.conf.j2 dest={{ junos_conf }}

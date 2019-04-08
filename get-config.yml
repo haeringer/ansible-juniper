@@ -1,6 +1,6 @@
 ---
 - name: Import cleanup playbook
-  import_playbook: _subpb_build-dirs.yml
+  import_playbook: create-build-dirs.yml
 
 - name: Get commited configuration of devices
   hosts: all

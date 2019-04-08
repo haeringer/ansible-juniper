@@ -1,0 +1,7 @@
+---
+- name: Create local build directories for configuration files
+  hosts: all
+  connection: local
+  gather_facts: no
+  tasks:
+    - local_action: file path={{ build_dir }} state=directory

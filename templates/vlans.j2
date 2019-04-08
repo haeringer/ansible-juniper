@@ -1,5 +1,5 @@
 {# helper-macro zum mergen der vlans aufrufen #}
-{% import 'functions/helpers.j2' as helpers with context %}
+{% import 'templates/helper-functions.j2' as helpers with context %}
 {% set vlans_merged = ({}) %}
 {% if group is defined %}
 {{ helpers.merge_vlans(group.vlan_groups, vlans_merged) }}

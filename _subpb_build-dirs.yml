@@ -1,8 +1,0 @@
----
-- name: CREATE BUILD DIRECTORIES FOR CONFIGURATION FILES
-  hosts: all
-  connection: local
-  gather_facts: no
-  tasks:
-    - name: create host build temp directory
-      local_action: file path={{ build_dir }} state=directory

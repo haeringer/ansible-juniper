@@ -2,15 +2,16 @@
 
 Ansible Release >= **2.5** plus Juniper Ansible Galaxy Role inkl. Abhängigkeiten:
 
-    pip install ansible jxmlease junos-eznc
+    pip install -r requirements.txt
 
-    ansible-galaxy install Juniper.junos
+    ansible-galaxy install -r requirements.yml
 
 
 #### Playbook Optionen
 
     -l     Ziel-Devices in hosts-Datei auf Gruppe oder einzelnen Host limiteren, z.B. -l "lab-ex"
     -e     extra-Variable angeben, z.B. -e commit=no (abhängig vom Playbook)
+    -t     Tag angeben, um nur bestimmte Tasks auszuführen, z.B. -t snap-pre
     -u     eigener Username (Tacacs-user in unserem Fall). Angabe nicht nötig, falls dieser dem lokalen User entspricht
     -k     Aufforderung zur Passworteingabe, falls kein SSH-Key vorhanden
 
@@ -45,3 +46,7 @@ Durch die optionale Angabe der Extra-Variable ```confirm=n``` kann ein 'commit c
 Durch die optionale Angabe der Extra-Variable ```push=false``` kann das Playbook ausgeführt werden, ohne dass überhaupt etwas auf die Geräte gepusht wird. So lässt sich z.B. die generierte Config lokal überprüfen.
 
     ansible-playbook main.yml -l ia1.b1 -e push=false
+
+Alternativ via ```build-config``` Tag:
+
+    ansible-playbook main.yml -l ia1.b1 -t build-config
