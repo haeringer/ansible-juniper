@@ -5,3 +5,4 @@
   gather_facts: no
   tasks:
     - local_action: file path={{ build_dir }} state=directory
+  tags: [build-config, push-config]
