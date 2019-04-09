@@ -10,10 +10,19 @@ Ansible Release >= **2.5** plus Juniper Ansible Galaxy Role inkl. Abhängigkeite
 #### Playbook Optionen
 
     -l     Ziel-Devices in hosts-Datei auf Gruppe oder einzelnen Host limiteren, z.B. -l "lab-ex"
-    -e     extra-Variable angeben, z.B. -e commit=no (abhängig vom Playbook)
+    -e     Extra-Variable angeben, z.B. -e commit=no (abhängig vom Playbook)
     -t     Tag angeben, um nur bestimmte Tasks auszuführen, z.B. -t snap-pre
-    -u     eigener Username (Tacacs-user in unserem Fall). Angabe nicht nötig, falls dieser dem lokalen User entspricht
+    -u     Eigener Username (Tacacs-user in unserem Fall). Angabe nicht nötig, falls dieser dem lokalen User entspricht
     -k     Aufforderung zur Passworteingabe, falls kein SSH-Key vorhanden
+
+
+#### Verfügbare Tags
+
+    build-config    Config lokal generieren, ohne sie auf die Geräte zu pushen
+    push-config     Config lokal generieren und auf die Geräte pushen
+    snap-pre        Status-Snapshot der Geräte vor einem Change erstellen
+    snap-post       Status-Snapshot der Geräte nach einem Change erstellen
+    snap-check      Zuvor erstellte Snapshots vergleichen und Tests durchführen
 
 
 ## Playbook zur Interface-Abfrage
@@ -50,3 +59,9 @@ Durch die optionale Angabe der Extra-Variable ```push=false``` kann das Playbook
 Alternativ via ```build-config``` Tag:
 
     ansible-playbook main.yml -l ia1.b1 -t build-config
+
+#### Config via Serial Console-Verbindung pushen
+
+Für die Ersteinrichtung von Geräten kann die Config via Netconf-over-serial-console gepusht werden:
+
+    ansible-playbook main.yml -l ia1.b1 -t push-config -e 'commit=yes connect_mode=serial connect_port=/dev/ttyUSB0'

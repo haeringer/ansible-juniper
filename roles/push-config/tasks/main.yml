@@ -1,6 +1,8 @@
 ---
 - name: 'Push Config to Device & Commit/Check'
   juniper_junos_config:
+    mode: '{{ connect_mode if connect_mode is defined else omit }}'
+    port: '{{ connect_port if connect_port is defined else omit }}'
     src: '{{ junos_conf }}'
     config_mode: '{{ config_mode if config_mode is defined else omit }}'
     load: 'update'
