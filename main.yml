@@ -1,5 +1,4 @@
 ---
-- import_playbook: playbooks/create-build-dirs.yml
 - import_playbook: playbooks/ex_int_access.yml
 - import_playbook: playbooks/ex_int_core.yml
 - import_playbook: playbooks/srx_int.yml
