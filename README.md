@@ -7,7 +7,7 @@ Ansible Release >= **2.5** plus Juniper Ansible Galaxy Role inkl. Abhängigkeite
     ansible-galaxy install -r requirements.yml
 
 
-#### Playbook Optionen
+## Playbook Optionen
 
     -l     Ziel-Devices in hosts-Datei auf Gruppe oder einzelnen Host limiteren, z.B. -l "lab-ex"
     -e     Extra-Variable angeben, z.B. -e commit=no (abhängig vom Playbook)
@@ -16,13 +16,22 @@ Ansible Release >= **2.5** plus Juniper Ansible Galaxy Role inkl. Abhängigkeite
     -k     Aufforderung zur Passworteingabe, falls kein SSH-Key vorhanden
 
 
-#### Verfügbare Tags
+## Tags
+
+Durch Tags können die Tasks in den Playbooks **gefiltert** werden, d.h. ohne Angabe von Tags werden alle Tasks ungefiltert ausgeführt. Mit einem Tag kann ein Task einzeln ausgeführt werden; es können auch mehrere Tags angegeben oder Tags geskippt werden.
+
+Verfügbare Tags:
 
     build-config    Config lokal generieren, ohne sie auf die Geräte zu pushen
-    push-config     Config lokal generieren und auf die Geräte pushen
+    push-config     Generierte config auf die Geräte pushen
     snap-pre        Status-Snapshot der Geräte vor einem Change erstellen
     snap-post       Status-Snapshot der Geräte nach einem Change erstellen
     snap-check      Zuvor erstellte Snapshots vergleichen und Tests durchführen
+
+Die beiden folgenden Beispiele führen dementsprechend zum gleichen Ergebnis:
+
+    ansible-playbook main.yml --tags 'build-config push-config'
+    ansible-playbook main.yml --skip-tags 'snap-pre snap-post snap-check'
 
 
 ## Playbook zur Interface-Abfrage

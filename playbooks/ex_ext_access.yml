@@ -6,9 +6,31 @@
   - import_role:
       name: build-cfg_ex_ext_access
     connection: local
-    tags: [build-config, push-config]
+    tags: build-config
 
-  - import_role:
-      name: push-config
-    when: push == 'true' or push is not defined
-    tags: push-config
+  - include_role:
+      name: '{{ item }}'
+    loop:
+      - test_interface-status
+    # - weitere tests...
+    vars:
+      _action: snap_pre
+    tags: snap-pre
+
+  - include_role:
+      name: '{{ item }}'
+    loop:
+      - test_interface-status
+    # - weitere tests...
+    vars:
+      _action: snap_post
+    tags: snap-post
+
+  - include_role:
+      name: '{{ item }}'
+    loop:
+      - test_interface-status
+    # - weitere tests...
+    vars:
+      _action: check
+    tags: snap-check
