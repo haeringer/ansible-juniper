@@ -17,16 +17,22 @@
         commands:
           - "show version"
       register: juniperjunoscommand
+      tags: test-1
+
     - name: juniper_junos_command Output...
       debug:
         var: juniperjunoscommand.stdout_lines[5]
+      tags: test-1
 
     - name: Retrieve Junos version via juniper_junos_rpc module
       juniper_junos_rpc:
         rpcs:
           - "get-software-information"
       register: juniperjunosrpc
+      tags: test-2
+
     - name: juniper_junos_rpc Output...
       debug:
         var: juniperjunosrpc
         #msg: "{{ juniperjunosrpc['parsed_output']['multi-routing-engine-results']['multi-routing-engine-item']['software-information']['junos-version'] }}"
+      tags: test-2

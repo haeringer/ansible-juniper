@@ -15,7 +15,7 @@
     # - weitere tests...
     vars:
       _action: snap_pre
-    tags: snap-pre
+    tags: [snap-pre,testing]
 
   - include_role:
       name: '{{ item }}'
@@ -24,7 +24,7 @@
     # - weitere tests...
     vars:
       _action: snap_post
-    tags: snap-post
+    tags: [snap-post,testing]
 
   - include_role:
       name: '{{ item }}'
@@ -33,4 +33,4 @@
     # - weitere tests...
     vars:
       _action: check
-    tags: snap-check
+    tags: [snap-check,testing]

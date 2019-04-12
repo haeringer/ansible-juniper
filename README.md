@@ -9,11 +9,12 @@ Ansible Release >= **2.5** plus Juniper Ansible Galaxy Role inkl. Abhängigkeite
 
 ## Playbook Optionen
 
-    -l     Ziel-Devices in hosts-Datei auf Gruppe oder einzelnen Host limiteren, z.B. -l "lab-ex"
-    -e     Extra-Variable angeben, z.B. -e commit=no (abhängig vom Playbook)
-    -t     Tag angeben, um nur bestimmte Tasks auszuführen, z.B. -t snap-pre
-    -u     Eigener Username (Tacacs-user in unserem Fall). Angabe nicht nötig, falls dieser dem lokalen User entspricht
-    -k     Aufforderung zur Passworteingabe, falls kein SSH-Key vorhanden
+    -l, --limit         Ziel-Devices in hosts-Datei auf Gruppe oder einzelnen Host limiteren, z.B. -l "lab-ex"
+    -e, --extra-vars    Extra-Variable angeben, z.B. -e commit=no (abhängig vom Playbook)
+    -t, --tags          Tag angeben, um nur bestimmte Tasks auszuführen, z.B. -t snap-pre
+    --skip-tags         Tasks mit diesem Tag überspringen
+    -u, --user          Eigener Username (Tacacs-user in unserem Fall). Angabe nicht nötig, falls dieser dem lokalen User entspricht
+    -k, --ask-pass      Aufforderung zur Passworteingabe, falls kein SSH-Key vorhanden
 
 
 ## Tags
@@ -27,11 +28,12 @@ Verfügbare Tags:
     snap-pre        Status-Snapshot der Geräte vor einem Change erstellen
     snap-post       Status-Snapshot der Geräte nach einem Change erstellen
     snap-check      Zuvor erstellte Snapshots vergleichen und Tests durchführen
+    testing         Sammel-Tag für snap-* getaggte Tasks
 
 Die beiden folgenden Beispiele führen dementsprechend zum gleichen Ergebnis:
 
     ansible-playbook main.yml --tags 'build-config push-config'
-    ansible-playbook main.yml --skip-tags 'snap-pre snap-post snap-check'
+    ansible-playbook main.yml --skip-tags testing
 
 
 ## Playbook zur Interface-Abfrage
