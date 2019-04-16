@@ -245,11 +245,15 @@ interfaces {
     {% if ae_ranges is defined %}
         {% for ae_range_name in ae_ranges %}
         {% set ae_range = ae_ranges[ae_range_name] %}
-            {% for member in ae_range.members %}
-                {% if member == _i_name %}
+            {% if ae_range.members is string and ae_range.members == _i_name %}
                     {{ subtemplate_int(ae_range, ae_range_name, false, none) }}
-                {% endif %}
-            {% endfor %}
+            {% elif ae_range.members is sequence %}
+                {% for member in ae_range.members %}
+                    {% if member == _i_name %}
+                    {{ subtemplate_int(ae_range, ae_range_name, false, none) }}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         {% endfor %}
     {% endif %}
 

@@ -45,16 +45,24 @@ protocols {
         {% endif %}
     {% endfor %}
     {% if ae_ranges is defined %}
-        {% for ae_range_name in if_ranges %}
+        {% for ae_range_name in ae_ranges %}
         {% set ae_range = ae_ranges[ae_range_name] %}
             {% if ae_range_name == 'switch-links' %}
-                {% for member in ae_range.members %}
+                {% if ae_range.members is string %}
+        interface {{ ae_range.members }} {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+                {% elif ae_range.members is sequence %}
+                    {% for member in ae_range.members %}
         interface {{ member }} {
             bpdu-timeout-action {
                 block;
             }
         }
-                {% endfor %}
+                    {% endfor %}
+                {% endif %}
             {% endif %}
         {% endfor %}
     {% endif %}
