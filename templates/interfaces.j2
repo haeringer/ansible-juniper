@@ -242,6 +242,17 @@ interfaces {
         }
     {% endif -%}
 
+    {% if ae_ranges is defined %}
+        {% for ae_range_name in ae_ranges %}
+        {% set ae_range = ae_ranges[ae_range_name] %}
+            {% for member in ae_range.members %}
+                {% if member == _i_name %}
+                    {{ subtemplate_int(ae_range, ae_range_name, false, none) }}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+
 {%- endmacro %}
 
 

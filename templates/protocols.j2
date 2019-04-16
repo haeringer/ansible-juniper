@@ -35,11 +35,29 @@ protocols {
         interface access-ports {
             edge;
         }
+    {% for if_range in if_ranges %}
+        {% if if_range == 'switch-links' %}
         interface switch-links {
             bpdu-timeout-action {
                 block;
             }
         }
+        {% endif %}
+    {% endfor %}
+    {% if ae_ranges is defined %}
+        {% for ae_range_name in if_ranges %}
+        {% set ae_range = ae_ranges[ae_range_name] %}
+            {% if ae_range_name == 'switch-links' %}
+                {% for member in ae_range.members %}
+        interface {{ member }} {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
         msti 1 {
             bridge-priority {{ mstp.bridge_prio }};
             vlan 1300-2399;
