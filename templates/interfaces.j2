@@ -160,6 +160,9 @@ interfaces {
 
     {% if _i_name is not number and 'ae' in _i_name %}
         aggregated-ether-options {
+        {% if _i.speed_individual_links is defined %}
+            link-speed {{ _i.speed_individual_links }};
+        {% endif %}
             lacp {
                 active;
             }
