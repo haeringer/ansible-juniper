@@ -1,0 +1,11 @@
+---
+- name: SCP Transfer
+  hosts: all
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    # Usage: ansible-playbook copy-file.yml -e 'src=srcpath dest=destpath'
+    - name: Copy local file to remote device
+      shell: scp {{ src }} {{ inventory_hostname }}:{{ dest }}
