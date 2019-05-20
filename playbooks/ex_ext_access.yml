@@ -6,7 +6,7 @@
   - import_role:
       name: build-cfg_ex_ext_access
     connection: local
-    tags: build-config
+    tags: [build-config,push-config]
 
   - include_role:
       name: '{{ item }}'
