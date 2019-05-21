@@ -1,0 +1,21 @@
+{# event-options config template macro #}
+
+{% macro junos_general() -%}
+
+event-options {
+    policy auto-rollback {
+{% if junos_els is defined and junos_els == true %}
+        events ui_commit_completed;
+{% else %}
+        events ui_commit;
+{% endif %}
+        then {
+            event-script auto-rollback.slax;
+        }
+    }
+    event-script {
+        file auto-rollback.slax;
+    }
+}
+
+{%- endmacro %}
