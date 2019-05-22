@@ -90,6 +90,7 @@ protocols {
 }
 {%- endmacro %}
 
+
 {# protocols config template macro ex intern core #}
 
 {% macro junos_ex_ic() -%}
@@ -158,6 +159,47 @@ protocols {
     {% endif %}
 }
 {%- endmacro %}
+
+
+{# protocols config template macro ex intern core neues office-netz 2019 #}
+
+{% macro junos_ex_ic_office() -%}
+
+protocols {
+    rstp {
+        bridge-priority {{ rstp.bridge_prio }};
+    {% for _iface in interfaces %}
+    {% set iface = interfaces[_iface] %}
+        {% if (iface.stp is defined and iface.stp == 'disable') %}
+        interface {{ _iface }}.0 {
+            disable;
+        }
+        {% endif %}
+    {% endfor %}
+    {% set ae_switchlinks = ae_ranges.get('switch-links') %}
+    {% if ae_switchlinks %}
+        {% for ae in ae_switchlinks.members %}
+        interface {{ ae }} {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+        {% endfor %}
+    {% endif %}
+        interface switchlinks {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+        bpdu-block-on-edge;
+    }
+    lldp {
+        port-id-subtype interface-name;
+        interface all;
+    }
+}
+{%- endmacro %}
+
 
 {# protocols config template macro ex extern #}
 
