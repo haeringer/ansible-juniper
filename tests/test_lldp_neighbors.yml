@@ -1,0 +1,15 @@
+tests_include:
+  - test_lldp_neighbors
+
+test_lldp_neighbors:
+  - command: show lldp neighbors
+  - iterate:
+      xpath: lldp-neighbor-information
+      id: lldp-remote-chassis-id
+      tests:
+        - list-not-less: lldp-remote-chassis-id
+          err: "Test failed! Post snapshot contains less LLDP neighbors than pre snapshot"
+          info: "Test succeeded! Number of LLDP neighbors matches"
+        - list-not-more: lldp-remote-chassis-id
+          err: "Test failed! Post snapshot contains more LLDP neighbors than pre snapshot"
+          info: "Test succeeded! Number of LLDP neighbors matches"

@@ -1,12 +1,12 @@
 ---
-- name: 'Collect Snapshot of Device Status (Pre Configuration)'
+- name: 'Collect Snapshot of Interface Status (Pre Configuration)'
   juniper_junos_jsnapy:
     action: 'snap_pre'
     test_files: 'tests/test_interface_status.yml'
   when: _action == 'snap_pre'
   tags: snap-pre
 
-- name: 'Collect Snapshot of Device Status (Post Configuration)'
+- name: 'Collect Snapshot of Interface Status (Post Configuration)'
   juniper_junos_jsnapy:
     action: 'snap_post'
     test_files: 'tests/test_interface_status.yml'
@@ -15,7 +15,7 @@
 
 - block:
 
-  - name: 'Compare Pre and Post Status Snapshots'
+  - name: 'Compare Interface Status Pre and Post Snapshots'
     juniper_junos_jsnapy:
       action: 'check'
       test_files: 'tests/test_interface_status.yml'
