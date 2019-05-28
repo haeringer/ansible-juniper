@@ -1,0 +1,44 @@
+---
+- name: 'Collect Pre Configuration Status Snapshot'
+  juniper_junos_jsnapy:
+    action: 'snap_pre'
+    dir: 'tests'
+    test_files:
+      - 'test_interface_status.yml'
+      - 'test_lldp_neighbors.yml'
+  when: _action == 'snap_pre'
+  tags: snap-pre
+
+- name: 'Collect Post Configuration Status Snapshot'
+  juniper_junos_jsnapy:
+    action: 'snap_post'
+    dir: 'tests'
+    test_files:
+      - 'test_interface_status.yml'
+      - 'test_lldp_neighbors.yml'
+  when: _action == 'snap_post'
+  tags: snap-post
+
+- block:
+
+  - name: 'Compare Pre and Post Status Snapshots'
+    juniper_junos_jsnapy:
+      action: 'check'
+      dir: 'tests'
+      test_files:
+        - 'test_interface_status.yml'
+        - 'test_lldp_neighbors.yml'
+    register: test_response
+
+  - name: 'Verify all JSNAPy tests passed'
+    assert:
+      that:
+        - 'test_response.passPercentage == 100'
+        - 'test_response.final_result == "Passed"'
+
+  # - name: Print the full test response
+  #   debug:
+  #     var: test_response
+
+  when: _action == 'check'
+  tags: snap-check
