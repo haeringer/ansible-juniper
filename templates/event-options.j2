@@ -3,18 +3,14 @@
 {% macro junos_general() -%}
 
 event-options {
-    policy auto-rollback {
-{% if junos_els is defined and junos_els == true %}
-        events ui_commit_completed;
-{% else %}
-        events ui_commit;
-{% endif %}
+    policy auto-commit-or-rollback-after-confirmed {
+        events ui_commit_confirmed_reminder;
         then {
-            event-script auto-rollback.slax;
+            event-script auto-commit-or-rollback.slax;
         }
     }
     event-script {
-        file auto-rollback.slax;
+        file auto-commit-or-rollback.slax;
     }
 }
 
