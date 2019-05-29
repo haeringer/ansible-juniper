@@ -2,6 +2,9 @@
 
 {% macro junos_general() -%}
 
+{% if skip_event_options is defined and skip_event_options == true %}
+{% else %}
+
 event-options {
     policy auto-commit-or-rollback-after-confirmed {
         events ui_commit_confirmed_reminder;
@@ -13,5 +16,7 @@ event-options {
         file auto-commit-or-rollback.slax;
     }
 }
+
+{% endif %}
 
 {%- endmacro %}
