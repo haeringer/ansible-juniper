@@ -57,6 +57,11 @@ system {
             protocol-version v2;
             rate-limit 10;
         }
+        {% if xnm is defined %}
+            {% if xnm == 'clear-text' %}
+        xnm-clear-text;
+            {% endif %}
+        {% endif %}
         netconf {
             ssh;
         }
