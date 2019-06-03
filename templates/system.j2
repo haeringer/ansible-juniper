@@ -57,14 +57,48 @@ system {
             protocol-version v2;
             rate-limit 10;
         }
-        {% if xnm is defined %}
-            {% if xnm == 'clear-text' %}
+    {% if xnm is defined %}
+        {% if xnm == 'clear-text' %}
         xnm-clear-text;
-            {% endif %}
         {% endif %}
+    {% endif %}
         netconf {
             ssh;
         }
+    {% if dhcp is defined %}
+        dhcp {
+        {% for pool_name in dhcp.pools %}
+        {% set pool = dhcp.pools[pool_name] %}
+            pool {{ pool_name }} {
+                address-range low {{ pool.range[0] }} high {{ pool.range[1] }};
+            {% if pool.lease_time is defined and pool.lease_time == 'infinite' %}
+                maximum-lease-time infinite;
+                default-lease-time infinite;
+            {% else %}
+                maximum-lease-time 432000;
+                default-lease-time 86400;
+            {% endif %}
+                name-server {
+                    194.29.226.55;
+                    194.29.230.55;
+                }
+                router {
+                    {{ pool.router }};
+                }
+                propagate-settings {{ pool.interface }};
+            }
+            {% if pool.static_bindings is defined %}
+                {% for binding in pool.static_bindings %}
+            static-binding {{ binding[0] }} {
+                fixed-address {
+                    {{ binding[1] }};
+                }
+            }
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        }
+    {% endif %}
     }
     syslog {
         user * {
