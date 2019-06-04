@@ -53,3 +53,39 @@ chassis {
     }
 }
 {%- endmacro %}
+
+{% macro junos_srx_int() -%}
+chassis {
+{% if cluster is defined %}
+    cluster {
+        control-link-recovery;
+        reth-count 8;
+        heartbeat-interval 1000;
+        heartbeat-threshold 4;
+    {% for rgroup_name in cluster.redundancy_groups %}
+    {% set rgroup = cluster.redundancy_groups[rgroup_name] %}
+        /* {{ rgroup.desc }} */
+        redundancy-group {{ rgroup_name }} {
+        {% if rgroup.primary_node == 0 %}
+            node 0 priority 254;
+            node 1 priority 1;
+        {% else %}
+            node 0 priority 1;
+            node 1 priority 254;
+        {% endif %}
+        {% if not rgroup_name == 0 %}
+            preempt;
+        {% endif %}
+        {% if rgroup.interface_monitor is defined %}
+            interface-monitor {
+            {% for interface in rgroup.interface_monitor %}
+                {{ interface }} weight 255;
+            {% endfor %}
+            }
+        {% endif %}
+        }
+    {% endfor %}
+    }
+{% endif %}
+}
+{%- endmacro %}
