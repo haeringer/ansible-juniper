@@ -5,10 +5,37 @@ routing-options {
     rib inet6.0 {
         static {
             route ::/0 next-hop {{ routing.v6_defaultgw }};
+        {% if routing.v6_static is defined %}
+            {%- for _route in routing.v6_static %}
+            {{ subtemplate_route(_route) }}
+            {% endfor %}
+        {% endif %}
         }
     }
     static {
         route 0.0.0.0/0 next-hop {{ routing.v4_defaultgw }};
+        {% if routing.v4_static is defined %}
+            {%- for _route in routing.v4_static %}
+        {{ subtemplate_route(_route) }}
+            {% endfor %}
+        {% endif %}
     }
 }
+{%- endmacro %}
+
+
+{# sub template fuer static route config (v4 + v6) #}
+
+{% macro subtemplate_route(_route) %}
+    {% if _route.desc is defined -%}
+        /* {{ _route.desc }} */
+    {% endif %}
+    {% if _route.retain is defined and _route.retain == true %}
+        route {{ _route.prefix }} {
+            next-hop {{ _route.next_hop }};
+            retain;
+        }
+    {%- else %}
+        route {{ _route.prefix }} next-hop {{ _route.next_hop }};
+    {%- endif %}
 {%- endmacro %}
