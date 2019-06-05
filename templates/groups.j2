@@ -1,0 +1,58 @@
+{# Cluster groups config template macro #}
+
+{% macro junos_srx_int() -%}
+{% if cluster is defined %}
+groups {
+    node0 {
+        system {
+            host-name {{ cluster.nodes.0.name }};
+        }
+        interfaces {
+            fxp0 {
+                unit 0 {
+                    family inet {
+                        address {{ cluster.nodes.0.mgmt_fxp0 }};
+                    }
+                }
+            }
+        }
+    }
+    node1 {
+        system {
+            host-name {{ cluster.nodes.1.name }};
+        }
+        interfaces {
+            fxp0 {
+                unit 0 {
+                    family inet {
+                        address {{ cluster.nodes.1.mgmt_fxp0 }};
+                    }
+                }
+            }
+        }
+    }
+    default-deny-template {
+        security {
+            policies {
+                from-zone <*> to-zone <*> {
+                    policy default-deny {
+                        match {
+                            source-address any;
+                            destination-address any;
+                            application any;
+                        }
+                        then {
+                            deny;
+                            log {
+                                session-init;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+apply-groups "${node}";
+{% endif %}
+{%- endmacro %}
