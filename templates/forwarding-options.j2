@@ -27,3 +27,23 @@ ethernet-switching-options {
 {% endif %}
 
 {%- endmacro %}
+
+
+{% macro junos_srx_int() -%}
+forwarding-options {
+{% if dhcp.helpers is defined %}
+    helpers {
+        bootp {
+    {% for srv in dhcp.helpers.dhcp_server %}
+            server {{ srv }};
+    {% endfor %}
+            interface {
+    {% for iface in dhcp.helpers.interfaces %}
+                {{ iface }};
+    {% endfor %}
+            }
+        }
+    }
+{% endif %}
+}
+{%- endmacro %}
