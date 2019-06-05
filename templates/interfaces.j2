@@ -155,7 +155,9 @@ interfaces {
     {% endif -%}
 
     {% if _i.redundancy_group is defined %}
-        redundancy-group {{ _i.redundancy_group }};
+        redundant-ether-options {
+            redundancy-group {{ _i.redundancy_group }};
+        }
     {% endif -%}
 
     {% if _i_name is not number and 'ae' in _i_name %}
@@ -230,14 +232,17 @@ interfaces {
         {% endif %}
         {% if _i.ipv4 is defined %}
             family inet {
-            {%- for _adr in _i.ipv4 %}
+            {% if _i.ipv4.filter is defined %}
+                {{ subtemplate_filter(_i.ipv4.filter) -}}
+            {% endif %}
+            {%- for _adr in _i.ipv4.addresses %}
                 {{ subtemplate_ip(_adr) -}}
             {% endfor %}
             }
         {% endif %}
         {% if _i.ipv6 is defined %}
             family inet6 {
-            {%- for _adr in _i.ipv6 %}
+            {%- for _adr in _i.ipv6.addresses %}
                 {{ subtemplate_ip(_adr) -}}
             {% endfor %}
             }
@@ -265,24 +270,38 @@ interfaces {
 
 {# sub template fuer ip config (v4 + v6) #}
 
-{% macro subtemplate_ip(_a) %}
+{% macro subtemplate_ip(_adr) %}
 
-{% if _a.type is defined or _a.static_arp is defined %}
-                address {{ _a.addr }} {
-    {% if _a.type is defined and _a.type is string %}
-                    {{ _a.type }};
-    {% elif _a.type is defined and _a.type is sequence %}
-        {% for _t in _a.type %}
-                    {{ _t }};
+{% if _adr.type is defined or _adr.static_arp is defined %}
+                address {{ _adr.ip }} {
+    {% if _adr.type is defined and _adr.type is string %}
+                    {{ _adr.type }};
+    {% elif _adr.type is defined and _adr.type is sequence %}
+        {% for _type in _adr.type %}
+                    {{ _type }};
         {% endfor %}
     {% endif %}
-    {% if _a.static_arp is defined %}
-        {% for _e in _a.static_arp %}
-                    arp {{ _e }} mac {{ _a.static_arp[_e] }};
+    {% if _adr.static_arp is defined %}
+        {% for _entry in _adr.static_arp %}
+                    arp {{ _entry }} mac {{ _adr.static_arp[_entry] }};
         {% endfor %}
     {% endif %}
                 }
 {% else %}
-                address {{ _a.addr }};
+                address {{ _adr.ip }};
 {% endif %}
+{%- endmacro %}
+
+
+{# sub template fuer filter config #}
+
+{% macro subtemplate_filter(filter) %}
+filter {
+{% if filter.input is defined %}
+                    input {{ filter.input }};
+{% endif %}
+{% if filter.output is defined %}
+                    output {{ filter.output }};
+{% endif %}
+                }
 {%- endmacro %}
