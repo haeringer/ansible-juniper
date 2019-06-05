@@ -308,3 +308,28 @@ lldp {
     interface ge-0/0/9.0;
 }
 {%- endmacro %}
+
+
+{# protocols config template srx intern #}
+
+{% macro junos_srx_int() -%}
+
+protocols {
+    igmp {
+        /* IGMP Snooping und Querier fuer Promox enabled */
+        interface reth5.3599 {
+            version 2;
+        }
+    }
+    router-advertisement {
+        interface reth1.0 {
+            other-stateful-configuration;
+            prefix 2a02:f28:2:598::/64;
+        }
+        interface reth5.1300 {
+            other-stateful-configuration;
+            prefix 2a02:f28:f:1300::/64;
+        }
+    }
+}
+{%- endmacro %}
