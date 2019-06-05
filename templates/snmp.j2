@@ -4,8 +4,18 @@
 snmp {
     location "{{ location }}";
     contact "{{ snmp.contact }}";
+    {% if snmp_clients is defined %}
+    client-list exampleorg-Monitoring {
+        {% for client in snmp_clients %}
+        {{ client }};
+        {% endfor %}
+    }
+    {% endif %}
     community {{ snmp.community }} {
         authorization read-only;
+    {% if snmp_clients is defined %}
+        client-list-name exampleorg-Monitoring;
+    {% endif %}
     }
     trap-group default {
         categories {
@@ -18,11 +28,14 @@ snmp {
             rmon-alarm;
             vrrp-events;
             configuration;
+    {% if device_type == 'srx' %}
+            chassis-cluster;
+    {% endif %}
         }
         targets {
-        {% for snmpsrv in snmp.servers %}
+    {% for snmpsrv in snmp.servers %}
             {{ snmpsrv }};
-        {% endfor %}
+    {% endfor %}
         }
     }
 }
