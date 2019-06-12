@@ -1,0 +1,124 @@
+{# security config template macro #}
+
+{% macro junos_srx_int() -%}
+security {
+    alg {
+        ftp ftps-extension;
+        sip disable;
+    }
+    forwarding-options {
+        family {
+            inet6 {
+                mode flow-based;
+            }
+        }
+    }
+    flow {
+        tcp-mss {
+            all-tcp {
+                mss 1350;
+            }
+            ipsec-vpn {
+                mss 1350;
+            }
+        }
+    }
+    screen {
+        ids-option untrust-screen {
+            icmp {
+                ip-sweep threshold 1000;
+                fragment;
+                large;
+                ping-death;
+            }
+            ip {
+                source-route-option;
+                tear-drop;
+            }
+            tcp {
+                fin-no-ack;
+                port-scan threshold 1000;
+                syn-flood {
+                    alarm-threshold 1024;
+                    attack-threshold 200;
+                    source-threshold 1024;
+                    destination-threshold 2048;
+                    timeout 20;
+                }
+                land;
+            }
+            udp {
+                flood threshold 10000;
+            }
+            limit-session {
+                source-ip-based 200;
+            }
+        }
+    }
+    nat {
+        source {
+{% for pool in source_nat.pools %}
+            pool {{ pool }} {
+                address {
+                    {{ source_nat.pools[pool] }};
+                }
+            }
+{% endfor %}
+            pool-utilization-alarm raise-threshold 80;
+{% for ruleset_name in source_nat.rule_sets %}
+{% set ruleset = source_nat.rule_sets[ruleset_name] %}
+            rule-set {{ ruleset_name }} {
+                from zone {{ ruleset.fromzone }};
+    {% if ruleset.tozone is sequence and ruleset.tozone is not string %}
+                to zone [ {% for _zone in ruleset.tozone %}{{ _zone }} {% endfor %}];
+    {% else %}
+                to zone {{ ruleset.tozone }};
+    {% endif %}
+    {% if ruleset.rules is defined %}
+        {% for rule_name in ruleset.rules %}
+        {% set rule = ruleset.rules[rule_name] %}
+            {{ subtemplate_natrule(rule, rule_name) }}
+        {% endfor %}
+    {% else %}
+            {{ subtemplate_natrule(ruleset, ruleset_name) }}
+    {% endif %}
+            }
+{% endfor %}
+        }
+    }
+}
+{%- endmacro %}
+
+{# sub template fuer nat rule config #}
+
+{% macro subtemplate_natrule(_rl, _rl_name) %}
+    rule {{ _rl_name }} {
+                    match {
+            {% if _rl.source is sequence and _rl.source is not string %}
+                        source-address [ {% for _src in _rl.source %}{{ _src }} {% endfor %}];
+            {% else %}
+                        source-address {{ _rl.source }};
+            {% endif %}
+            {% if _rl.destination is defined %}
+                {% if _rl.destination is sequence and _rl.destination is not string %}
+                        destination-address [ {% for dest in _rl.destination %}{{ dest }} {% endfor %}];
+                {% else %}
+                        destination-address {{ _rl.destination }};
+                {% endif %}
+            {% endif %}
+                    }
+                    then {
+                        source-nat {
+            {% if _rl.then == 'interface-nat' %}
+                            interface;
+            {% elif _rl.then == 'disable-nat' %}
+                            off;
+            {% else %}
+                            pool {
+                                {{ _rl.then }};
+                            }
+            {% endif %}
+                        }
+                    }
+                }
+{%- endmacro %}
