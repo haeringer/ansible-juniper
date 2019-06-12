@@ -107,9 +107,21 @@ security {
             }
 {% endfor %}
         }
+{% if proxy_arp is defined %}
+        proxy-arp {
+    {% for entry in proxy_arp %}
+            interface {{ entry.interface }} {
+                address {
+                    {{ entry.address }};
+                }
+            }
+    {% endfor %}
+        }
+{% endif %}
     }
 }
 {%- endmacro %}
+
 
 {# sub template fuer source nat rule config #}
 
