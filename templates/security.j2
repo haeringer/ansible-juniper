@@ -77,10 +77,32 @@ security {
     {% if ruleset.rules is defined %}
         {% for rule_name in ruleset.rules %}
         {% set rule = ruleset.rules[rule_name] %}
-            {{ subtemplate_natrule(rule, rule_name) }}
+            {{ subtemplate_srcnatrule(rule, rule_name) }}
         {% endfor %}
     {% else %}
-            {{ subtemplate_natrule(ruleset, ruleset_name) }}
+            {{ subtemplate_srcnatrule(ruleset, ruleset_name) }}
+    {% endif %}
+            }
+{% endfor %}
+        }
+        destination {
+{% for pool_name in destination_nat.pools %}
+{% set pool = destination_nat.pools[pool_name] %}
+            pool {{ pool_name }} {
+                address {{ pool.address }} port {{ pool.port }};
+            }
+{% endfor %}
+{% for ruleset_name in destination_nat.rule_sets %}
+{% set ruleset = destination_nat.rule_sets[ruleset_name] %}
+            rule-set {{ ruleset_name }} {
+                from zone {{ ruleset.fromzone }};
+    {% if ruleset.rules is defined %}
+        {% for rule_name in ruleset.rules %}
+        {% set rule = ruleset.rules[rule_name] %}
+            {{ subtemplate_destnatrule(rule, rule_name) }}
+        {% endfor %}
+    {% else %}
+            {{ subtemplate_destnatrule(ruleset, ruleset_name) }}
     {% endif %}
             }
 {% endfor %}
@@ -89,9 +111,9 @@ security {
 }
 {%- endmacro %}
 
-{# sub template fuer nat rule config #}
+{# sub template fuer source nat rule config #}
 
-{% macro subtemplate_natrule(_rl, _rl_name) %}
+{% macro subtemplate_srcnatrule(_rl, _rl_name) %}
     rule {{ _rl_name }} {
                     match {
             {% if _rl.source is sequence and _rl.source is not string %}
@@ -119,6 +141,32 @@ security {
                             }
             {% endif %}
                         }
+                    }
+                }
+{%- endmacro %}
+
+
+{# sub template fuer destination nat rule config #}
+
+{% macro subtemplate_destnatrule(_rl, _rl_name) %}
+    rule {{ _rl_name }} {
+                    match {
+            {% if _rl.source is sequence and _rl.source is not string %}
+                        source-address [ {% for _src in _rl.source %}{{ _src }} {% endfor %}];
+            {% else %}
+                        source-address {{ _rl.source }};
+            {% endif %}
+            {% if _rl.destination is defined %}
+                {% if _rl.destination is sequence and _rl.destination is not string %}
+                        destination-address [ {% for dest in _rl.destination %}{{ dest }} {% endfor %}];
+                {% else %}
+                        destination-address {{ _rl.destination }};
+                {% endif %}
+                        destination-port {{ _rl.port_external }};
+            {% endif %}
+                    }
+                    then {
+                        destination-nat pool {{ _rl.then }};
                     }
                 }
 {%- endmacro %}
