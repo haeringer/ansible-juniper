@@ -119,6 +119,35 @@ security {
         }
 {% endif %}
     }
+    policies {
+{% for policy_name in policies %}
+{% set policy = policies[policy_name] %}
+        from-zone {{ policy.fromzone }} to-zone {{ policy.tozone }} {
+            policy {{ policy_name }} {
+                match {
+    {% if policy.source is sequence and policy.source is not string %}
+                    source-address [ {% for _src in policy.source %}{{ _src }} {% endfor %}];
+    {% else %}
+                    source-address {{ policy.source }};
+    {% endif %}
+    {% if policy.destination is sequence and policy.destination is not string %}
+                    destination-address [ {% for _dest in policy.destination %}{{ _dest }} {% endfor %}];
+    {% else %}
+                    destination-address {{ policy.destination }};
+    {% endif %}
+    {% if policy.application is sequence and policy.application is not string %}
+                    application [ {% for _app in policy.application %}{{ _app }} {% endfor %}];
+    {% else %}
+                    application {{ policy.application }};
+    {% endif %}
+                }
+                then {
+                    {{ policy.action }};
+                }
+            }
+        }
+{% endfor %}
+    }
 }
 {%- endmacro %}
 
@@ -143,13 +172,13 @@ security {
                     }
                     then {
                         source-nat {
-            {% if _rl.then == 'interface-nat' %}
+            {% if _rl.action == 'interface-nat' %}
                             interface;
-            {% elif _rl.then == 'disable-nat' %}
+            {% elif _rl.action == 'disable-nat' %}
                             off;
             {% else %}
                             pool {
-                                {{ _rl.then }};
+                                {{ _rl.action }};
                             }
             {% endif %}
                         }
@@ -178,7 +207,7 @@ security {
             {% endif %}
                     }
                     then {
-                        destination-nat pool {{ _rl.then }};
+                        destination-nat pool {{ _rl.action }};
                     }
                 }
 {%- endmacro %}
