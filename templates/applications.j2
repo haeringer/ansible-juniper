@@ -1,0 +1,22 @@
+{# srx applications template macro #}
+
+{% macro junos_general() -%}
+applications {
+    application junos-ssh inactivity-timeout 18000;
+{% for _app_name in applications %}
+{% set _app = applications[_app_name] %}
+    application {{ _app_name }} {
+        protocol {{ _app.protocol }};
+        destination-port {{ _app.port }};
+    }
+{% endfor %}
+{% for _appset_name in applicationsets %}
+{% set _appset = applicationsets[_appset_name] %}
+    application-set {{ _appset_name }} {
+    {% for _setapp in _appset %}
+        application {{ _setapp }};
+    {% endfor %}
+    }
+{% endfor %}
+}
+{%- endmacro %}
