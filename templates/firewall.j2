@@ -1,0 +1,48 @@
+{# firewall config template macro #}
+
+{% macro junos_general() -%}
+firewall {
+{% for filter_name in firewall.filter %}
+{% set _filter = firewall.filter[filter_name] %}
+    filter {{ filter_name }} {
+    {% for term_name in _filter.terms|sort %}
+    {% set term = _filter.terms[term_name] %}
+        term {{ term_name }} {
+        {% if term|length > 1 %}
+            from {
+            {% if term.destination_address is defined %}
+                destination-address {
+                    {{ term.destination_address }};
+                }
+            {% endif %}
+            {% if term.source_address is defined %}
+                source-address {
+                    {{ term.source_address }};
+                }
+            {% endif %}
+            {% if term.source_list is defined %}
+                source-prefix-list {
+                    {{ term.source_list }};
+                }
+            {% endif %}
+            {% if term.protocol is defined %}
+                protocol {{ term.protocol }};
+            {% endif %}
+            {% if term.destination_port is defined %}
+                {% if term.destination_port is sequence and term.destination_port is not string %}
+                destination-port [ {% for _port in term.destination_port %}{{ _port }} {% endfor %}];
+                {% else %}
+                destination-port {{ term.destination_port }};
+                {% endif %}
+            {% endif %}
+            }
+        {% endif %}
+            then {
+                {{ term.action }};
+            }
+        }
+    {% endfor %}
+    }
+{% endfor %}
+}
+{%- endmacro %}
