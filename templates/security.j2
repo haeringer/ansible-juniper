@@ -148,6 +148,73 @@ security {
         }
 {% endfor %}
     }
+    zones {
+{% for zone_name in zones %}
+{% set zone = zones[zone_name] %}
+        security-zone {{ zone_name }} {
+            tcp-rst;
+            address-book {
+    {% for addr in zone.addresses %}
+                address {{ addr }} {{ zone.addresses[addr] }};
+    {% endfor %}
+    {% if zone.addrsets is defined %}
+        {% for addrset_name in zone.addrsets %}
+        {% set addrset = zone.addrsets[addrset_name] %}
+                address-set {{ addrset_name }} {
+            {% if addrset is sequence %}
+                {% for addr in addrset %}
+                    address {{ addr }};
+                {% endfor %}
+            {% endif %}
+                }
+        {% endfor %}
+    {% endif %}
+            }
+            host-inbound-traffic {
+                system-services {
+    {% if zone.allowed_inbound_services is defined %}
+        {% if zone.allowed_inbound_services == 'all' %}
+        {% set _inbound = 'all' %}
+                    all;
+        {% elif zone.allowed_inbound_services is sequence and zone.allowed_inbound_services is not string %}
+                    ping;
+                    traceroute;
+            {% for service in zone.allowed_inbound_services %}
+                    {{ service }};
+            {% endfor %}
+        {% else %}
+                    ping;
+                    traceroute;
+                    {{ zone.allowed_inbound_services }};
+        {% endif %}
+    {% else %}
+                    ping;
+                    traceroute;
+    {% endif %}
+                }
+                protocols {
+    {% if _inbound is defined and _inbound == 'all' %}
+                    all;
+    {% else %}
+                    router-discovery;
+    {% endif %}
+                }
+            }
+    {% if zone.ids_screen is defined %}
+            screen {{ zone.ids_screen }};
+    {% endif %}
+            interfaces {
+    {% if zone.interfaces is sequence and zone.interfaces is not string %}
+        {% for interface in zone.interfaces %}
+                {{ interface }};
+        {% endfor %}
+    {% else %}
+                {{ zone.interfaces }};
+    {% endif %}
+            }
+        }
+{% endfor %}
+    }
 }
 {%- endmacro %}
 
