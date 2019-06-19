@@ -6,7 +6,7 @@
     src: '{{ junos_conf }}'
     config_mode: '{{ config_mode if config_mode is defined else omit }}'
     load: 'update'
-    timeout: '60'
+    timeout: '120'
     commit: '{{ commit }}'
     confirm: '{{ confirm if confirm is defined else omit }}'
     diffs_file: '{{ compare_conf }}'
