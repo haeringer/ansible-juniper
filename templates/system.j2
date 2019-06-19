@@ -57,6 +57,98 @@ system {
             protocol-version v2;
             rate-limit 10;
         }
+        netconf {
+            ssh;
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+    {% if virtualchassis is defined %}
+    commit synchronize;
+    {% endif %}
+    ntp {
+    {% for ntpsrv in ntp.servers %}
+        server {{ ntpsrv }};
+    {% endfor %}
+    }
+}
+{%- endmacro %}
+
+
+{% macro junos_srx_int() -%}
+/* Config generiert durch Ansible */
+system {
+    {% if junos_els is defined and junos_els == true %}
+    auto-snapshot;
+    {% endif %}
+    domain-name example.com;
+    domain-search [ intern.example.com mgmt.intern.example.com mon.intern.example.com cust.intern.example.com ];
+    time-zone {{ time_zone }};
+    no-redirects;
+    authentication-order [ tacplus password ];
+    ports {
+        console {
+            log-out-on-disconnect;
+            type vt100;
+        }
+    }
+    root-authentication {
+        encrypted-password "{{ root_password }}"; ## SECRET-DATA
+    }
+    name-server {
+        192.168.26.17;
+        192.168.26.53;
+    }
+    tacplus-server {
+    {% for tacsrv in tacacs.servers %}
+        {{ tacsrv.ip }} {
+            port 49;
+            secret "{{ tacsrv.secret }}"; ## SECRET-DATA
+            timeout 10;
+            single-connection;
+            source-address 10.29.224.1;
+        }
+    {% endfor %}
+    }
+    login {
+		announcement "\n\t####   SYSTEM CONFIG GENERIERT DURCH ANSIBLE   ####\n\n\tInfos zur Konfiguration:\n\thttps://wiki.intern.example.com/x/coAhAQ\n\n\n";
+        class rancid {
+            permissions [ access admin firewall flow-tap interface network routing secret security snmp system trace view ];
+        }
+        class ro-extended {
+            permissions [ secret view view-configuration ];
+        }
+    {% for usr in users %}
+        user {{ usr.name }} {
+            class {{ usr.class }};
+            {% if usr.passwd is defined %}
+            authentication {
+                encrypted-password "{{ usr.passwd }}"; ## SECRET-DATA
+            }
+            {% elif usr.ssh_key is defined %}
+            authentication {
+                ssh-rsa "{{ usr.ssh_key }}"; ## SECRET-DATA
+            }
+            {% endif %}
+        }
+    {% endfor %}
+    }
+    services {
+        ssh {
+            root-login deny;
+            protocol-version v2;
+            rate-limit 3;
+        }
     {% if xnm is defined %}
         {% if xnm == 'clear-text' %}
         xnm-clear-text;
@@ -81,6 +173,7 @@ system {
                 name-server {
                     194.29.226.55;
                     194.29.230.55;
+                    94.198.61.84
                 }
                 router {
                     {{ pool.router }};
@@ -101,20 +194,27 @@ system {
     {% endif %}
     }
     syslog {
+        archive size 100k files 3;
         user * {
             any emergency;
         }
         file messages {
-            any notice;
+            any critical;
             authorization info;
         }
         file interactive-commands {
             interactive-commands any;
         }
+        file config-changes {
+            change-log info;
+        }
+        file default-log-messages {
+            any any;
+            structured-data;
+        }
     }
-    {% if virtualchassis is defined %}
-    commit synchronize;
-    {% endif %}
+    max-configurations-on-flash 20;
+    max-configuration-rollbacks 15;
     ntp {
     {% for ntpsrv in ntp.servers %}
         server {{ ntpsrv }};

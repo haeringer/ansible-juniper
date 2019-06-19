@@ -28,7 +28,7 @@ snmp {
             rmon-alarm;
             vrrp-events;
             configuration;
-    {% if device_type == 'srx' %}
+    {% if device_type is defined and device_type == 'srx' %}
             chassis-cluster;
     {% endif %}
         }

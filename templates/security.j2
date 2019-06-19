@@ -151,8 +151,11 @@ security {
     zones {
 {% for zone_name in zones %}
 {% set zone = zones[zone_name] %}
+{% set zone_dhcp = [] %}
         security-zone {{ zone_name }} {
+    {% if not zone_name == 'untrust' %}
             tcp-rst;
+    {% endif %}
             address-book {
     {% for addr in zone.addresses %}
                 address {{ addr }} {{ zone.addresses[addr] }};
@@ -178,9 +181,15 @@ security {
                     all;
         {% elif zone.allowed_inbound_services is sequence and zone.allowed_inbound_services is not string %}
                     ping;
+            {% if not zone_name == 'untrust' %}
                     traceroute;
-            {% for service in zone.allowed_inbound_services %}
-                    {{ service }};
+            {% endif %}
+            {% for _service in zone.allowed_inbound_services %}
+                {% if not _service == 'dhcp' and not _service == 'dhcpv6' %}
+                    {{ _service }};
+                {% else %}
+                    {% if zone_dhcp.append(1) %}{% endif %} {# use 'if' as workaround to use append() #}
+                {% endif %}
             {% endfor %}
         {% else %}
                     ping;
@@ -192,13 +201,15 @@ security {
                     traceroute;
     {% endif %}
                 }
+    {% if not zone_name == 'untrust' %}
                 protocols {
-    {% if _inbound is defined and _inbound == 'all' %}
+        {% if _inbound is defined and _inbound == 'all' %}
                     all;
-    {% else %}
+        {% else %}
                     router-discovery;
-    {% endif %}
+        {% endif %}
                 }
+    {% endif %}
             }
     {% if zone.ids_screen is defined %}
             screen {{ zone.ids_screen }};
@@ -206,10 +217,32 @@ security {
             interfaces {
     {% if zone.interfaces is sequence and zone.interfaces is not string %}
         {% for interface in zone.interfaces %}
+            {% if zone_dhcp %}
+                {{ interface }} {
+                    host-inbound-traffic {
+                        system-services {
+                            dhcp;
+                            dhcpv6;
+                        }
+                    }
+                }
+            {% else %}
                 {{ interface }};
+            {% endif %}
         {% endfor %}
     {% else %}
+        {% if zone_dhcp %}
+                {{ zone.interfaces }} {
+                    host-inbound-traffic {
+                        system-services {
+                            dhcp;
+                            dhcpv6;
+                        }
+                    }
+                }
+        {% else %}
                 {{ zone.interfaces }};
+        {% endif %}
     {% endif %}
             }
         }
