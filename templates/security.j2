@@ -151,7 +151,6 @@ security {
     zones {
 {% for zone_name in zones %}
 {% set zone = zones[zone_name] %}
-{% set zone_dhcp = [] %}
         security-zone {{ zone_name }} {
     {% if not zone_name == 'untrust' %}
             tcp-rst;
@@ -175,35 +174,11 @@ security {
             }
             host-inbound-traffic {
                 system-services {
-    {% if zone.allowed_inbound_services is defined %}
-        {% if zone.allowed_inbound_services == 'all' %}
-        {% set _inbound = 'all' %}
-                    all;
-        {% elif zone.allowed_inbound_services is sequence and zone.allowed_inbound_services is not string %}
-                    ping;
-            {% if not zone_name == 'untrust' %}
-                    traceroute;
-            {% endif %}
-            {% for _service in zone.allowed_inbound_services %}
-                {% if not _service == 'dhcp' and not _service == 'dhcpv6' %}
-                    {{ _service }};
-                {% else %}
-                    {% if zone_dhcp.append(1) %}{% endif %} {# use 'if' as workaround to use append() #}
-                {% endif %}
-            {% endfor %}
-        {% else %}
-                    ping;
-                    traceroute;
-                    {{ zone.allowed_inbound_services }};
-        {% endif %}
-    {% else %}
-                    ping;
-                    traceroute;
-    {% endif %}
+{{ inbound_services(zone, zone_name, false) }}
                 }
     {% if not zone_name == 'untrust' %}
                 protocols {
-        {% if _inbound is defined and _inbound == 'all' %}
+        {% if zone.allowed_inbound_services is defined and zone.allowed_inbound_services == 'all' %}
                     all;
         {% else %}
                     router-discovery;
@@ -217,32 +192,27 @@ security {
             interfaces {
     {% if zone.interfaces is sequence and zone.interfaces is not string %}
         {% for interface in zone.interfaces %}
-            {% if zone_dhcp %}
                 {{ interface }} {
                     host-inbound-traffic {
                         system-services {
-                            dhcp;
-                            dhcpv6;
+        {{ inbound_services(zone, zone_name, true) }}
                         }
                     }
                 }
-            {% else %}
-                {{ interface }};
-            {% endif %}
         {% endfor %}
     {% else %}
-        {% if zone_dhcp %}
                 {{ zone.interfaces }} {
                     host-inbound-traffic {
                         system-services {
-                            dhcp;
-                            dhcpv6;
+        {{ inbound_services(zone, zone_name, true) }}
                         }
+        {% if zone.allowed_inbound_services is defined and zone.allowed_inbound_services == 'all' %}
+                        protocols {
+                            all;
+                        }
+        {% endif %}
                     }
                 }
-        {% else %}
-                {{ zone.interfaces }};
-        {% endif %}
     {% endif %}
             }
         }
@@ -250,6 +220,44 @@ security {
     }
 }
 {%- endmacro %}
+
+{% macro inbound_services(zone, zone_name, is_interface) %}
+    {% if zone.allowed_inbound_services is defined %}
+        {% if zone.allowed_inbound_services == 'all' %}
+        {% set _inbound = 'all' %}
+                    all;
+        {% elif zone.allowed_inbound_services is sequence and zone.allowed_inbound_services is not string %}
+                    ping;
+            {% if not zone_name == 'untrust' %}
+                    traceroute;
+            {% endif %}
+            {% for _service in zone.allowed_inbound_services %}
+                {% if is_interface and _service == 'dhcp' %}
+                    dhcp;
+                    dhcpv6;
+                {% elif _service != 'dhcp' %}
+                    {{ _service }};
+                {% endif %}
+            {% endfor %}
+        {% else %}
+                    ping;
+            {% if not zone_name == 'untrust' %}
+                    traceroute;
+            {% endif %}
+            {% if is_interface and zone.allowed_inbound_services == 'dhcp' %}
+                    dhcp;
+                    dhcpv6;
+            {% elif zone.allowed_inbound_services != 'dhcp' %}
+                    {{ zone.allowed_inbound_services }};
+            {% endif %}
+        {% endif %}
+    {% else %}
+                    ping;
+        {% if not zone_name == 'untrust' %}
+                    traceroute;
+        {% endif %}
+    {% endif %}
+{% endmacro %}
 
 
 {# sub template fuer source nat rule config #}
