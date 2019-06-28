@@ -181,10 +181,11 @@ system {
                 propagate-settings {{ pool.interface }};
             }
             {% if pool.static_bindings is defined %}
-                {% for binding in pool.static_bindings %}
-            static-binding {{ binding[0] }} {
+                {% for _ip in pool.static_bindings %}
+                {% set _mac = pool.static_bindings[_ip] %}
+            static-binding {{ _mac }} {
                 fixed-address {
-                    {{ binding[1] }};
+                    {{ _ip }};
                 }
             }
                 {% endfor %}
