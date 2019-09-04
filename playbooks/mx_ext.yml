@@ -1,0 +1,32 @@
+---
+- name: '### JUNIPER MX ROUTE FILTER AUTOMATION ###'
+  hosts: all
+  tasks:
+
+  - import_role:
+      name: build-cfg_mx_ext
+    connection: local
+    tags: [build-config,push-config]
+
+  # - include_role:
+  #     name: tests_switch
+  #   vars:
+  #     _action: snap_pre
+  #   tags: snap-pre
+
+  - import_role:
+      name: push-config
+    when: push == 'true' or push is not defined
+    tags: push-config
+
+  # - include_role:
+  #     name: tests_switch
+  #   vars:
+  #     _action: snap_post
+  #   tags: snap-post
+
+  # - include_role:
+  #     name: tests_switch
+  #   vars:
+  #     _action: check
+  #   tags: snap-check

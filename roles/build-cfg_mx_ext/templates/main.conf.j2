@@ -1,0 +1,7 @@
+#jinja2:lstrip_blocks: True
+
+{%- import 'templates/policy-options.j2' as _policy_options with context -%}
+
+
+{# config-template macros #}
+{{ _policy_options.junos_general() }}
