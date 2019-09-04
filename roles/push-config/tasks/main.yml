@@ -5,7 +5,7 @@
     port: '{{ connect_port if connect_port is defined else omit }}'
     src: '{{ junos_conf }}'
     config_mode: '{{ config_mode if config_mode is defined else omit }}'
-    load: 'update'
+    load: '{{ load if load is defined else "update" }}'
     timeout: '300'
     commit: '{{ commit }}'
     confirm: '{{ confirm if confirm is defined else omit }}'
