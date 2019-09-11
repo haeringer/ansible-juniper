@@ -1,0 +1,19 @@
+tests_include:
+  - test_bgp_summary
+
+test_bgp_summary:
+  - command: show bgp summary
+  - iterate:
+      xpath: bgp-peer[./peer-state/text()='Established']
+      id: peer-address
+      tests:
+        - no-diff: peer-state
+          info: 'Test succeeded! peer-state of AS{{post["peer-as"]}}, {{post["peer-address"]}} is unchanged ({{post["peer-state"]}})'
+          err: 'Test failed! peer-state of AS{{post["peer-as"]}}, {{post["peer-address"]}} has changed from {{pre["peer-state"]}} to {{post["peer-state"]}}'
+  - iterate:
+      xpath: bgp-rib
+      id: name
+      tests:
+        - delta: active-prefix-count, 2%
+          info: 'Checking BGP peer active prefix count (tolerance 2%): {{post["active-prefix-count"]}}'
+          err: 'The number of active prefixes {{post["name"]}} has changed over 2%: [Before = {{pre["active-prefix-count"]}} / After = {{post["active-prefix-count"]}}]'
