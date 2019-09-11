@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  ansible-juniper:
+    build:
+      context: .
+      args:
+        - USERNAME=$USER
+    environment:
+      USER: $USER
+      SSH_AUTH_SOCK: /ssh-agent
+    volumes:
+      # Forward local SSH agent to container (does not work on MacOS)
+      - $SSH_AUTH_SOCK:/ssh-agent
+      - type: bind
+        source: $HOME/.ssh
+        target: /home/$USER/.ssh
+      - type: bind
+        source: .
+        target: /ansible-juniper
+    command: bash
+    stdin_open: true
+    tty: true
