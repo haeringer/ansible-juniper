@@ -4,11 +4,15 @@
 policy-options {
 {% if policy_options.prefix_lists is defined %}
     {% for list in policy_options.prefix_lists %}
+        {% if list.prefixes is defined %}
     prefix-list {{ list.name }} {
-        {% for prefix in list.prefixes %}
+            {% for prefix in list.prefixes %}
         {{ prefix }};
-        {% endfor %}
+            {% endfor %}
     }
+        {% else %}
+    prefix-list {{ list.name }};
+        {% endif %}
     {% endfor %}
 {% endif %}
 }
