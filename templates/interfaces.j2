@@ -128,19 +128,33 @@ interfaces {
         {% if _i.etheroptions.no_autoneg is defined and _i.etheroptions.no_autoneg == true %}
             no-auto-negotiation;
         {% endif %}
-        {% if _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'full' %}
+        {% if junos_els is not defined %}
+            {% if _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'full' %}
             link-mode full-duplex;
-        {% elif _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'half' %}
+            {% elif _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'half' %}
             no-flow-control;
             link-mode half-duplex;
-        {% endif %}
-        {% if _i.etheroptions.speed is defined %}
+            {% endif %}
+            {% if _i.etheroptions.speed is defined %}
             speed {
                 {{ _i.etheroptions.speed }};
             }
+            {% endif %}
         {% endif %}
         }
     {% endif -%}
+
+    {% if junos_els is defined and junos_els == true %}
+        {% if _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'full' %}
+        link-mode full-duplex;
+        {% elif _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'half' %}
+        no-flow-control;
+        link-mode half-duplex;
+        {% endif %}
+        {% if _i.etheroptions.speed is defined %}
+        speed {{ _i.etheroptions.speed }};
+        {% endif %}
+    {% endif %}
 
     {% if _i.fabricoptions is defined %}
         fabric-options {
