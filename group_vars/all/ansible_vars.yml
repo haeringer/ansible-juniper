@@ -8,3 +8,6 @@ base_dir: ~/ansible_tmp/{{ inventory_hostname }}
 build_dir: '{{ base_dir }}/build'
 junos_conf: '{{ build_dir }}/junos.conf'
 compare_conf: '{{ base_dir }}/compare.conf'
+
+# Silence warnings about the Python interpreter
+ansible_python_interpreter: auto_silent
