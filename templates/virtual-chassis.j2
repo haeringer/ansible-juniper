@@ -10,6 +10,9 @@ virtual-chassis {
     member {{ member_name }} {
         role {{ _member.role }};
         serial-number {{ _member.serial }};
+        {% if _member.location is defined %}
+        location {{ _member.location }};
+        {% endif %}
     }
     {% endfor %}
 }
