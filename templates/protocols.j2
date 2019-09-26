@@ -161,9 +161,9 @@ protocols {
 {%- endmacro %}
 
 
-{# protocols config template macro ex intern core neues office-netz 2019 #}
+{# protocols config template macro ex office core neues office-netz 2019 #}
 
-{% macro junos_ex_ic_office() -%}
+{% macro junos_ex_oc() -%}
 
 protocols {
     rstp {
@@ -196,6 +196,66 @@ protocols {
     lldp {
         port-id-subtype interface-name;
         interface all;
+    }
+}
+{%- endmacro %}
+
+
+{# protocols config template macro ex office access neues office-netz 2019 #}
+
+{% macro junos_ex_oa() -%}
+
+protocols {
+    igmp-snooping {
+        vlan all;
+    }
+    rstp {
+        bridge-priority {{ rstp.bridge_prio }};
+    {% for _iface in interfaces %}
+    {% set iface = interfaces[_iface] %}
+        {% if (iface.stp is defined and iface.stp == 'disable') %}
+        interface {{ _iface }}.0 {
+            disable;
+        }
+        {% endif %}
+    {% endfor %}
+        interface access-ports {
+            edge;
+        }
+    {% set ae_switchlinks = ae_ranges.get('switch-links') %}
+    {% if ae_switchlinks %}
+        {% if ae_switchlinks.members is string %}
+        interface {{ ae_switchlinks.members }} {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+        {% elif ae_switchlinks.members is sequence %}
+            {% for ae in ae_switchlinks.members %}
+        interface {{ ae }} {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+    {% set if_switchlinks = if_ranges.get('switch-links') %}
+    {% if if_switchlinks %}
+        interface switchlinks {
+            bpdu-timeout-action {
+                block;
+            }
+        }
+    {% endif %}
+        bpdu-block-on-edge;
+    }
+    lldp {
+        port-id-subtype interface-name;
+        interface all;
+    }
+    lldp-med {
+        interface access-ports;
     }
 }
 {%- endmacro %}
