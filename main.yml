@@ -1,6 +1,7 @@
 ---
 - import_playbook: playbooks/ex_ia.yml
 - import_playbook: playbooks/ex_ic.yml
-- import_playbook: playbooks/ex_ic-office.yml
+- import_playbook: playbooks/ex_oa.yml
+- import_playbook: playbooks/ex_oc.yml
 - import_playbook: playbooks/srx_int.yml
 # - import_playbook: playbooks/ex_ext_access.yml
