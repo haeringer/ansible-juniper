@@ -2,7 +2,7 @@
 
 {% macro junos_general() -%}
 
-{% if junos_els is defined and junos_els == true %}
+{% if junos_els is not defined or junos_els == true %}
 forwarding-options {
     storm-control-profiles standard {
         all;

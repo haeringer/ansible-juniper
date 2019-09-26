@@ -67,7 +67,7 @@ interfaces {
 {% endif -%}
 
 {% if vlan_units is defined %}
-    {% if junos_els is defined and junos_els == true %}
+    {% if junos_els is not defined or junos_els == true %}
     irb {
     {% else %}
     vlan {
@@ -106,7 +106,7 @@ interfaces {
     {% endif -%}
 
     {% if _i.native is defined %}
-        {% if junos_els is defined and junos_els == true %}
+        {% if junos_els is not defined or junos_els == true %}
         native-vlan-id {{ _i.native }};
         {% endif %}
     {% endif %}
@@ -128,7 +128,7 @@ interfaces {
         {% if _i.etheroptions.no_autoneg is defined and _i.etheroptions.no_autoneg == true %}
             no-auto-negotiation;
         {% endif %}
-        {% if junos_els is not defined %}
+        {% if junos_els is defined and junos_els == false %}
             {% if _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'full' %}
             link-mode full-duplex;
             {% elif _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'half' %}
@@ -144,7 +144,7 @@ interfaces {
         }
     {% endif -%}
 
-    {% if junos_els is defined and junos_els == true %}
+    {% if junos_els is not defined or junos_els == true %}
         {% if _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'full' %}
         link-mode full-duplex;
         {% elif _i.etheroptions.duplex is defined and _i.etheroptions.duplex == 'half' %}
@@ -191,7 +191,7 @@ interfaces {
         unit 0 {
             family ethernet-switching {
             {% if _i.mode is defined %}
-                {% if junos_els is defined and junos_els == true %}
+                {% if junos_els is not defined or junos_els == true %}
                 interface-mode {{ _i.mode }};
                 {% else %}
                 port-mode {{ _i.mode }};
@@ -207,7 +207,7 @@ interfaces {
                 {% elif _i.vlans is sequence -%}
                     [ {% for vln in _i.vlans|sort %}{{ vlans_merged[vln] }} {% endfor %}
                         {% if _i.native is defined %}
-                          {% if junos_els is defined and junos_els == true %}{{ _i.native }}{% endif %}
+                          {% if junos_els is not defined or junos_els == true %}{{ _i.native }}{% endif %}
                         {% endif %}];
                 {% endif %}
                 }
@@ -219,13 +219,13 @@ interfaces {
                 }
             {% endif %}
             {% if _i.native is defined %}
-                {% if junos_els is defined and junos_els == true %}
+                {% if junos_els is not defined or junos_els == true %}
                     {# do nothing here; simpler than testing negative conditions #}
                 {% else %}
                 native-vlan-id {{ _i.native }};
                 {% endif %}
             {% endif %}
-            {% if junos_els is defined and junos_els == true %}
+            {% if junos_els is not defined or junos_els == true %}
                 storm-control standard;
             {% endif %}
             }

@@ -17,7 +17,7 @@ vlans {
         {% if vlan_units is defined %}
             {% for unit in vlan_units %}
                 {% if vln_id == unit %}
-                    {% if junos_els is defined and junos_els == true %}
+                    {% if junos_els is not defined or junos_els == true %}
         l3-interface irb.{{ vln_id }};
                     {% else %}
         l3-interface vlan.{{ vln_id }};

@@ -4,7 +4,7 @@
 /* Config generiert durch Ansible */
 system {
     host-name {{ inventory_hostname }};
-    {% if junos_els is defined and junos_els == true %}
+    {% if junos_els is not defined or junos_els == true %}
     auto-snapshot;
     {% endif %}
     domain-name {{ domain_name }};
@@ -88,7 +88,7 @@ system {
 {% macro junos_srx_int() -%}
 /* Config generiert durch Ansible */
 system {
-    {% if junos_els is defined and junos_els == true %}
+    {% if junos_els is not defined or junos_els == true %}
     auto-snapshot;
     {% endif %}
     domain-name example.com;
