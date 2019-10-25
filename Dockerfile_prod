@@ -1,13 +1,12 @@
 FROM python:3.7-slim
 
-LABEL Name="exampleorg NOC Ansible-Juniper Docker Image fuer lokale Dev-Umgebung"
+LABEL Name="exampleorg NOC Ansible-Juniper Docker Image fuer Jenkins Pipeline"
 
-ARG key
+ARG keypath_credstore
 ARG user
 
 ARG workdir=ansible-juniper
-ARG keypath=/home/$user/.ssh/
-ARG keyfile=$keypath/id_rsa
+ARG keyfile=/home/$user/.ssh/id_rsa
 
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y vim openssh-client iputils-ping dnsutils
@@ -21,8 +20,8 @@ RUN pip3 install -r requirements.txt
 RUN ansible-galaxy install -r requirements.yml
 
 RUN useradd --create-home --shell /bin/bash $user
-RUN chown -R $user:$user /$workdir
-USER $user
+COPY keyfile $keyfile
+RUN chown -R $user:$user /$workdir $keyfile
+RUN chmod 600 $keyfile
 
-RUN mkdir -p $keypath && touch $keyfile
-RUN echo $key | tr ';' '\n' > $keyfile && chmod 600 $keyfile
+USER $user
