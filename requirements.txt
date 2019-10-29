@@ -1,4 +1,4 @@
 ansible==2.8.*
-junos-eznc==2.1.*
+junos-eznc==2.2.*
 jxmlease==1.0.*
 jsnapy==1.3.*
