@@ -5,9 +5,8 @@ services:
     build:
       context: .
       args:
-        - USERNAME=$USER
+        - username=$USER
     environment:
-      USER: $USER
       SSH_AUTH_SOCK: /ssh-agent
     volumes:
       # Forward local SSH agent to container (does not work on MacOS)
