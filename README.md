@@ -1,9 +1,30 @@
 ## Requirements
 
-Ansible Release >= **2.5** plus Juniper Ansible Galaxy Role inkl. Abhängigkeiten:
+### Ausführung von Ansible in Docker auf lokalem Rechner
 
-    pip install -r requirements.txt
+    Install Docker: https://docs.docker.com/install/
 
+Beim Build des Docker-Images muss der eigene SSH private Key für den Zugriff auf die Netzwerkgeräte mitgegeben werden. Das Image ist daher nur für den Gebrauch auf dem lokalen, persönlichen Rechner geeignet!
+
+    git clone https://gogs.intern.example.com/noc/ansible-juniper.git
+    cd ansible-juniper
+    docker-compose build --build-arg key="$(cat ~/.ssh/[yourprivatekey] | tr '\n' ';')"
+    docker-compose run ansible-juniper bash
+
+Falls `ssh-add` innerhalb des Containers nicht funktioniert:
+
+    eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa
+
+
+### Alternativ: Lokale Installation der Abhängigkeiten
+
+    git clone https://gogs.intern.example.com/noc/ansible-juniper.git
+    cd ansible-juniper
+    apt-get install python3-pip python3-venv
+    python3 -m venv .venv
+    source .venv/bin/activate
+    export PIPENV_VENV_IN_PROJECT
+    pip3 install -r requirements.txt
     ansible-galaxy install -r requirements.yml
 
 
