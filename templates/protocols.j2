@@ -209,6 +209,21 @@ protocols {
     igmp-snooping {
         vlan all;
     }
+    {% if dot1x is defined and dot1x == true %}
+    dot1x {
+        authenticator {
+            authentication-profile-name PNAC1;
+            interface {
+                access-dot1x {
+                    supplicant multiple;
+                    guest-vlan VL1900_Service-Support;
+                    server-reject-vlan VL1900_Service-Support;
+                    server-fail use-cache;
+                }
+            }
+        }
+    }
+    {% endif %}
     rstp {
         bridge-priority {{ rstp.bridge_prio }};
     {% for _iface in interfaces %}
