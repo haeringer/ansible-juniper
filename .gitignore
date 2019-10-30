@@ -2,3 +2,4 @@ ansible.log
 *.swp
 .DS_Store
 roles/Juniper.junos/
+.venv
