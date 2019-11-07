@@ -1,0 +1,31 @@
+---
+- name: PUSH COMMAND TO DEVICE
+  hosts: all
+  vars:
+    ansible_connection: netconf
+    ansible_network_os: junos
+  roles:
+    - Juniper.junos
+  gather_facts: no
+
+  tasks:
+
+  - name: 'Use juniper_junos_config module to push command via netconf'
+    juniper_junos_config:
+      lines: '{{ line }}'
+      load: 'merge'
+      commit: '{{ commit }}'
+      confirm: '{{ confirm if confirm is defined else omit }}'
+      diff: 'yes'
+    register: response
+
+  - name: 'Output diff if changes are present, else skip:'
+    debug:
+      var: response.diff_lines
+    when: response.diff_lines is defined
+
+  - name: 'Message from juniper_junos_config:'
+    debug:
+      var: response.msg
+
+
