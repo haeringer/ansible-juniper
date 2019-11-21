@@ -18,12 +18,13 @@ WORKDIR /$workdir
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
-RUN ansible-galaxy install -r requirements.yml
 
 RUN useradd --create-home --shell /bin/bash $username
 RUN chown -R $username:$username /$workdir
 ENV USER=$username
 USER $username
+
+RUN ansible-galaxy install --roles-path ~/.ansible/roles -r requirements.yml
 
 RUN mkdir -p $keypath && touch $keyfile
 RUN echo $key | tr ';' '\n' > $keyfile && chmod 600 $keyfile
