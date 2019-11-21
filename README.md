@@ -1,26 +1,23 @@
-## Requirements
+# Ansible-Juniper
 
-### Ausführung von Ansible in Docker auf lokalem Rechner
+This is an example layout for provisioning a Juniper-based network infrastructure with Ansible. It provides the following features:
 
-    Install Docker: https://docs.docker.com/install/
+- Configuration via netconf with the juniper_junos_config Ansible module
+- Modular template structure for config provisioning across different device types
+- Reusable roles for individual tasks like building configs or pushing to devices
+- Integrated tests of network / protocol status with Jsnapy
+- Flexible execution of playbook tasks via predefined tags
 
-Beim Build des Docker-Images muss der eigene SSH private Key für den Zugriff auf die Netzwerkgeräte mitgegeben werden. Das Image ist daher nur für den Gebrauch auf dem lokalen, persönlichen Rechner geeignet!
 
-    git clone https://gogs.intern.example.com/noc/ansible-juniper.git
+## Preparation
+
+### Option 1 - Manual dependency installation for running Ansible directly on a host
+
+(Example uses apt for a Debian-based OS)
+
+    git clone https://github.com/haeringer/ansible-juniper.git
     cd ansible-juniper
-    docker-compose build --build-arg key="$(cat ~/.ssh/[yourprivatekey] | tr '\n' ';')"
-    docker-compose run ansible-juniper bash
-
-Falls `ssh-add` innerhalb des Containers nicht funktioniert:
-
-    eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa
-
-
-### Alternativ: Lokale Installation der Abhängigkeiten
-
-    git clone https://gogs.intern.example.com/noc/ansible-juniper.git
-    cd ansible-juniper
-    apt-get install python3-pip python3-venv
+    apt-get update && apt-get install python3-pip python3-venv
     python3 -m venv .venv
     source .venv/bin/activate
     export PIPENV_VENV_IN_PROJECT
@@ -28,72 +25,89 @@ Falls `ssh-add` innerhalb des Containers nicht funktioniert:
     ansible-galaxy install -r requirements.yml
 
 
-## Playbook Optionen
+### Option 2 - Building and running Ansible in a Docker container
 
-    -l, --limit         Ziel-Devices in hosts-Datei auf Gruppe oder einzelnen Host limiteren, z.B. -l "lab-ex"
-    -e, --extra-vars    Extra-Variable angeben, z.B. -e commit=no (abhängig vom Playbook)
-    -t, --tags          Tag angeben, um nur bestimmte Tasks auszuführen, z.B. -t snap-pre
-    --skip-tags         Tasks mit diesem Tag überspringen
-    -u, --user          Eigener Username (Tacacs-user in unserem Fall). Angabe nicht nötig, falls dieser dem lokalen User entspricht
-    -k, --ask-pass      Aufforderung zur Passworteingabe, falls kein SSH-Key vorhanden
+    Install Docker: https://docs.docker.com/install/
+
+When building this Docker image with the provided docker-compose file, you need to include your private SSH key for accessing your network devices. Therefore, this image is not intended for distribution, but only for usage on your local personal computer.
+
+    git clone https://github.com/haeringer/ansible-juniper.git
+    cd ansible-juniper
+    docker-compose build --build-arg key="$(cat ~/.ssh/[yourprivatekey] | tr '\n' ';')"
+    docker-compose run ansible-juniper bash
+
+Add your SSH key to the ssh-agent:
+
+    eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa
+
+
+## Playbook options primer
+
+    -l, --limit         Limit target devices in hosts files to a group or a single host, e.g. `-l reg1_loc1`
+    -e, --extra-vars    Provide extra variable, e.g. `-e commit=yes confirm=1` (depending on playbook)
+    -t, --tags          Provide tag for executing only specific tasks from within a playbook, e.g. `-t snap-pre`
+    --skip-tags         Skip this tasks
+    -u, --user          Provide a username other than your current shell user
+    -k, --ask-pass      Make Ansible ask for a password, in case you don't use SSH keys
 
 
 ## Tags
 
-Durch Tags können die Tasks in den Playbooks **gefiltert** werden, d.h. ohne Angabe von Tags werden alle Tasks ungefiltert ausgeführt. Mit einem Tag kann ein Task einzeln ausgeführt werden; es können auch mehrere Tags angegeben oder Tags geskippt werden.
+With tags, the tasks within a playbook can be filtered. That means, when running a playbook without any tags, all tasks within the playbook are executed. With a tag, a task can be executed individually or be skipped.
 
-Verfügbare Tags:
+Available/predefined tags:
 
-    build-config    Config lokal generieren, ohne sie auf die Geräte zu pushen
-    push-config     Generierte config auf die Geräte pushen
-    snap-pre        Status-Snapshot der Geräte vor einem Change erstellen
-    snap-post       Status-Snapshot der Geräte nach einem Change erstellen
-    snap-check      Zuvor erstellte Snapshots vergleichen und Tests durchführen
-    testing         Sammel-Tag für snap-* getaggte Tasks
+    build-config    Generate configs locally, without contacting remote devices
+    push-config     Push generated configs to devices
+    snap-pre        Create status snapshots from devices before change
+    snap-post       Create status snapshots from devices after change
+    snap-check      Compare previously created snapshots and run tests
+    testing         Aggregate tag for snap-* tagged tasks
 
-Die beiden folgenden Beispiele führen dementsprechend zum gleichen Ergebnis:
+The following examples will have the same result:
 
     ansible-playbook main.yml --tags 'build-config push-config'
     ansible-playbook main.yml --skip-tags testing
 
 
-## Playbook zur Interface-Abfrage
+## Main playbook for provisioning the infrastructure
 
-Abfrage des Interface-Status (führt ```show interfaces terse```+ ```descriptions``` via CLI aus), um z.B. freie Interfaces zu identifizieren
-
-	ansible-playbook get-interfaces.yml -l ia1.b1
-
-
-## Playbook zur Automatisierung der Infrastruktur
-
-Playbook konfiguriert alle Systeme via juniper_junos_config Modul. Wird bei Pushes in *master* automatisch über Jenkins ausgeführt. Greift per default auf Inventory ```hosts_production``` zurück, wo alle **noch nicht automatisierten Systeme auskommentiert** sind. Die Datei ```hosts_production``` NICHT unbedacht ändern, sonst können Konfigurationen von Produktivsystemen überschrieben werden.
+Playbook provisions device configurations with the juniper_junos_config module to all systems.
+The extra variable `commit` is mandatory.
 
     ansible-playbook main.yml -e commit=yes
 
 #### 'show | compare'
 
-Durch die Angabe der Extra-Variable ```commit=no``` kann ein "show | compare"-artiger Diff von Konfigurationsänderungen durchgeführt werden. Die config wird dabei auf das Device gepusht, verglichen und direkt anschließend ein Rollback durchgeführt. Damit können Änderungen non-destruktiv verifiziert werden.
+By running with `commit=no`, a "`show |compare`"-like diff of the configuration changes can be generated. This way changes can be verified non-destructively when testing, before committing anything.
 
-    ansible-playbook main.yml -l ia1.b1 -e commit=no
+    ansible-playbook main.yml -l switch1.loc1 -e commit=no
 
 #### 'commit confirmed'
 
-Durch die optionale Angabe der Extra-Variable ```confirm=n``` kann ein 'commit confirmed' mit automatischem Rollback nach ```n``` Minuten durchgeführt werden.
+By providing the extra variable `confirm=n`, a "`commit confirmed`" with rollback after `n` minutes can be performed.
 
-    ansible-playbook main.yml -l ia1.b1 -e 'commit=yes confirm=1'
+    ansible-playbook main.yml -e 'commit=yes confirm=1'
 
-#### Config nur lokal generieren, ohne zu pushen
+#### Generate local config only
 
-Durch die optionale Angabe der Extra-Variable ```push=false``` kann das Playbook ausgeführt werden, ohne dass überhaupt etwas auf die Geräte gepusht wird. So lässt sich z.B. die generierte Config lokal überprüfen.
+By providing the extra variable `push=false`, the playbook can be run without pushing anything to the devices. This can be helpful for examining the generated configs locally, e.g. when developing templates (the configs are saved at `~/ansible_tmp/`).
 
-    ansible-playbook main.yml -l ia1.b1 -e push=false
+    ansible-playbook main.yml -e push=false
 
-Alternativ via ```build-config``` Tag:
+Alternatively via `build-config` tag:
 
-    ansible-playbook main.yml -l ia1.b1 -t build-config
+    ansible-playbook main.yml -t build-config
 
-#### Config via Serial Console-Verbindung pushen
+#### Push config via serial console connection
 
-Für die Ersteinrichtung von Geräten kann die Config via Netconf-over-serial-console gepusht werden:
+For initial device provisioning, it is also possible to push the config via netconf-over-serial-console:
 
-    ansible-playbook main.yml -l ia1.b1 -t push-config -e 'commit=yes connect_mode=serial connect_port=/dev/ttyUSB0'
+    ansible-playbook main.yml -l switch1.loc1 -t push-config -e 'commit=yes connect_mode=serial connect_port=/dev/ttyUSB0'
+
+
+### An example playbook for retrieving interface status
+
+Query a device for the status of its interfaces:
+
+	ansible-playbook playbooks/get-interfaces.yml -l switch1.loc1
