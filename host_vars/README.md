@@ -190,15 +190,15 @@ interfaces:
 ```
 interfaces:
   ge-fpc/pic/port:
-  mstp: disable
+  stp: disable
 ```
-The interface will be disabled under `protocols { mstp }` and `bpdu drop` under `ethernet-switching-options` will be enabled.
+The interface will be disabled under `protocols { rstp/mstp }` and `bpdu drop` under `ethernet-switching-options` will be enabled.
 
 #### Example
 ```
 interfaces:
   ge-0/0/1:
-  mstp: disable
+  stp: disable
 ```
 
 ### Interface MTU
