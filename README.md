@@ -40,6 +40,11 @@ When building this Docker image with the provided docker-compose file, you need 
     eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa
 
 
+## Configuring host variables
+
+For information about the variables that are available through the templates, see https://github.com/haeringer/ansible-juniper/blob/master/host_vars/README.md
+
+
 ## Playbook options primer
 
     -l, --limit         Limit target devices in hosts files to a group or a single host, e.g. `-l reg1_loc1`
@@ -80,7 +85,7 @@ The extra variable `commit` is mandatory.
 
 By running with `commit=no`, a "`show |compare`"-like diff of the configuration changes can be generated. This way changes can be verified non-destructively when testing, before committing anything.
 
-    ansible-playbook main.yml -l switch1.loc1 -e commit=no
+    ansible-playbook main.yml -l loc1.switch1 -e commit=no
 
 #### 'commit confirmed'
 
@@ -102,11 +107,11 @@ Alternatively via `build-config` tag:
 
 For initial device provisioning, it is also possible to push the config via netconf-over-serial-console:
 
-    ansible-playbook main.yml -l switch1.loc1 -t push-config -e 'commit=yes connect_mode=serial connect_port=/dev/ttyUSB0'
+    ansible-playbook main.yml -l loc1.switch1 -t push-config -e 'commit=yes connect_mode=serial connect_port=/dev/ttyUSB0'
 
 
 ### An example playbook for retrieving interface status
 
 Query a device for the status of its interfaces:
 
-	ansible-playbook playbooks/get-interfaces.yml -l switch1.loc1
+	ansible-playbook playbooks/get-interfaces.yml -l loc1.switch1
