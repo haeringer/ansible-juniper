@@ -1,0 +1,30 @@
+### all devices ###
+
+[all:children]
+region1
+
+
+### Region 1 ###
+
+[region1:children]
+reg1_srx
+reg1_ex_core
+reg1_ex_access
+
+[reg1_srx]
+firewall1
+
+[reg1_ex_core]
+loc1.coreswitch1
+loc2.coreswitch1
+
+[reg1_ex_access:children]
+reg1_loc1
+reg1_loc2
+
+[reg1_loc1]
+loc1.switch1
+loc1.switch2
+
+[reg1_loc2]
+loc2.switch1
