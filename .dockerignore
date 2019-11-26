@@ -2,8 +2,5 @@
 .gitignore
 .DS_Store
 .dockerignore
-.python-version
 Dockerfile
-Jenkinsfile
-jenkins_parsing-rules
 roles/Juniper.junos
