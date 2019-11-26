@@ -1,5 +1,11 @@
 {# event-options config template macro #}
 
+{#
+    For the referenced event script see
+    https://github.com/haeringer/junos-on-box
+#}
+
+
 {% macro junos_general() -%}
 
 {% if skip_event_options is defined and skip_event_options == true %}
