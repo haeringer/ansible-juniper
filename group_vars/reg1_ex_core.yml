@@ -1,0 +1,6 @@
+---
+group:
+  vlan_groups:
+    - reg1_loc1
+    - reg1_loc2
+    - reg1_loc-all

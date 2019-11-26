@@ -1,0 +1,54 @@
+---
+time_zone: Europe/Berlin
+domain_name: mgmt.example.com
+root_password: $1$hs8hd66G$d33VB1siZOLQWTczTJo2P9
+snmp:
+  community: somecommunity123
+  contact: noc@example.com
+  servers:
+    - 10.1.2.3
+    - 10.2.3.4
+ntp:
+  servers:
+    - 10.3.4.5
+    - 10.4.5.6
+dns:
+  servers:
+    - 10.5.6.7
+    - 10.6.7.8
+tacacs:
+  servers:
+    - ip: 10.7.8.9
+      secret: $9$hs8hd66G$d33VB1siZOLQWTczTJo2P5z
+radius:
+  servers:
+    - ip: 10.8.9.10
+      secret: '$9$3mls74RvlQKFbQt9lGMLwWwSlKpEkkle'
+    - ip: 10.9.10.11
+      secret: '$9$hs8hd66G$d33VB1siZOLQWTczTJo2Pgg'
+sflow:
+  collector_ip: 10.10.11.12
+  polling_interval: 20
+  sampling_rate: 20
+
+classes:
+
+  - name: ro-extended
+    permissions: [ secret, view, view-configuration, maintenance ]
+
+users:
+
+  - name: emergency
+    class: super-user
+    passwd: $1$Hr2T4OE4Qg3le9F7v6ZrZjrnMqMbEm9
+
+  - name: remote
+    class: read-only
+
+  - name: someone
+    class: super-user
+    ssh_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDmpED5hSz8P2n8sfgE206BKL1t7hHumo4Dyp9w9/orz5g+xrxcbO7j2C87kCeOcOwuCX7t/hx3/zSZc8vCFEsJaW4mi11VnHANz7strdOein72MkW+qJG4/pivK+jN313ev90Hu1mGsornb2x1vR9NpRuAwLLKPnW3k9rgT/KfzPcUK06FKgUwDFd1gk/VmI/vhvCvwLgDeo+bEDWSBWEpzVV2Tj/U/yUzwucGUUFnqV2n7cjrq5WWTwMOm13GmG5PidbVgu0plFplcj+t7hJDBFbFcO/GtrAPt6OMuDpOXJ0zJhwDNdApB195HtyFtdrhalTcevYPBtJxxQsEdhqR'
+
+  - name: config-mgmt
+    class: ro-extended
+    ssh_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQcFh5uicl8nHyyAVQI942jjI91MD+vshxa25aFs4iWwE0XU3I5m/Q3tONlr9l7YHd5pBl3JOgAWmcFVw3TMPWi6aBZi5g8WDs/NpkQLzRht7pf2FfjzV2xLkjaz74O80P5pz6Fd2r8sD4P0WhJuxnpXp0G9RzPSrHhegBuPdr1pxW5geFN1QkJJHJ3ETCqKLjJLCgVXLqmo03JIbdBygwFbJzo8F97hLSmuSmTmCIMlGkNZarhGWT+CiKwgphyC8lw1OYTzdtdn3Tkj5MClRfRYsZzDYDwQK6AZpZ5FRJLHk9lzTFSeUfdB3SGL4wQjHNEfJqfZQw7ze51PWsbEz7'

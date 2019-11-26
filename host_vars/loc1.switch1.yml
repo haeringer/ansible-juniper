@@ -1,0 +1,72 @@
+---
+location: Loc1.R10.R01
+dot1x: true
+rstp:
+  bridge_prio: 32k
+ae_ranges:
+  switch-links:
+    members: ae0
+    mode: trunk
+    vlans: all
+if_ranges:
+  access-ports:
+    member_ranges:
+      - ge-0/0/0 to ge-0/0/11
+    mode: access
+  access-dot1x:
+    member_ranges:
+      - ge-0/0/0 to ge-0/0/4
+  VL1110-ports:
+    member_ranges:
+      - ge-0/0/5 to ge-0/0/9
+    vlans: 1110
+interfaces:
+  ge-0/0/0:
+    desc: dot1x 1
+  ge-0/0/1:
+    desc: dot1x 2
+  ge-0/0/2:
+    desc: dot1x 3
+  ge-0/0/3:
+    desc: dot1x 4
+  ge-0/0/4:
+    desc: dot1x 5
+  ge-0/0/5:
+    desc: VL1110 1
+  ge-0/0/6:
+    desc: VL1110 2
+  ge-0/0/7:
+    desc: VL1110 3
+  ge-0/0/8:
+    desc: VL1110 4
+  ge-0/0/9:
+    desc: VL1110 legacy host
+    etheroptions:
+      no_autoneg: true
+      speed: 100m
+  ge-0/0/10:
+    desc: VL1210 hostX
+    vlans: 1210
+  ge-0/0/11:
+    desc: VL1310 hostY
+    vlans: 1310
+  xe-0/1/0:
+    desc: coreswitch1.loc1 xe-0/0/0
+    etheroptions:
+      lacp_interface: ae0
+  xe-0/1/1:
+    desc: coreswitch1.loc1 xe-1/0/0
+    etheroptions:
+      lacp_interface: ae0
+  ae0:
+    desc: coreswitch1.loc1 ae0
+    speed_individual_links: 10g
+vlan_units:
+  1010:
+    desc: "{{ inventory_hostname }} Mgmt"
+    ipv4:
+      addresses:
+        - ip: 10.10.10.3/24
+    ipv6:
+      addresses:
+        - ip: fda4:bfb5:ac20:1010::3/64

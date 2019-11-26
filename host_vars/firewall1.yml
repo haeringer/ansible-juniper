@@ -1,0 +1,899 @@
+device_type: srx
+no_mgmt_int: true
+xnm: clear-text
+routing:
+  v4_defaultgw: 100.100.100.101
+  v6_defaultgw: fda4:bfb5:ac20:10::1
+  v4_static:
+    - prefix: 10.1.2.3/32
+      next_hop: 10.2.3.4
+      desc: somehost
+      retain: true
+location: Loc1/Loc2
+cluster:
+  nodes:
+    0:
+      name: firstnode
+      mgmt_fxp0: 10.1.1.1/24
+    1:
+      name: secondnode
+      mgmt_fxp0: 10.1.1.2/24
+  redundancy_groups:
+    0:
+      desc: Control-Plane Master
+      primary_node: 0
+    1:
+      desc: Loc1 Master
+      primary_node: 0
+    2:
+      desc: Loc2 Master
+      primary_node: 1
+dhcp:
+  pools:
+    10.40.0.0/24:
+      range: [10.40.0.2, 10.40.0.254]
+      router: 10.40.0.1
+      interface: reth1.4000
+  helpers:
+    dhcp_server: [10.8.9.10, 10.9.10.11]
+    interfaces: [reth1.1010, reth1.1011]
+snmp_clients:
+  - 10.1.2.3/32
+  - 10.2.3.4/32
+interfaces:
+  ge-0/0/0:
+    desc: 'Uplink 1 to untrust'
+    etheroptions:
+      redundant_parent: reth0
+  ge-0/0/1:
+    desc: 'loc1.coreswitch1'
+    etheroptions:
+      redundant_parent: reth1
+  ge-5/0/0:
+    desc: 'Uplink 2 to untrust'
+    etheroptions:
+      redundant_parent: reth0
+  ge-5/0/2:
+    desc: 'loc2.coreswitch1'
+    etheroptions:
+      redundant_parent: reth2
+  fab0:
+    desc: Fabric Link firstnode to secondnode
+    fabricoptions:
+      members: [ge-0/0/3, ge-0/0/15]
+  fab1:
+    desc: Fabric Link secondnode to firstnode
+    fabricoptions:
+      members: [ge-5/0/3, ge-5/0/15]
+  reth0:
+    desc: 'Uplink to untrust'
+    vlan_tagging: true
+    redundancy_group: 1
+    units:
+      101:
+        desc: 'VL101 to untrust'
+        ipv4:
+          filter:
+            input: firewall-mgmt
+          addresses:
+            - ip: 200.200.200.201/28
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:20::1/112
+  reth1:
+    desc: 'loc1.coreswitch1 trunk'
+    vlan_tagging: true
+    redundancy_group: 1
+    units:
+      1010:
+        desc: VL1010_Purpose10_Loc1
+        ipv4:
+          addresses:
+            - ip: 10.10.10.1/24
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:1010::1/64
+      1110:
+        desc: VL1110_Purpose11_Loc1
+        ipv4:
+          addresses:
+            - ip: 10.11.10.1/24
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:1110::1/64
+      1210:
+        desc: VL1210_Purpose12_Loc1
+        ipv4:
+          addresses:
+            - ip: 10.12.10.1/24
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:1210::1/64
+      1310:
+        desc: VL1310_Purpose13_Loc1
+        ipv4:
+          addresses:
+            - ip: 10.13.10.1/24
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:1310::1/64
+  reth2:
+    desc: 'loc2.coreswitch1 trunk'
+    vlan_tagging: true
+    redundancy_group: 1
+    units:
+      1011:
+        desc: VL1011_Purpose10_Loc1
+        ipv4:
+          addresses:
+            - ip: 10.10.11.1/24
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:1011::1/64
+      1111:
+        desc: VL1111_Purpose11_Loc1
+        ipv4:
+          addresses:
+            - ip: 10.11.11.1/24
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:1111::1/64
+      1211:
+        desc: VL1211_Purpose12_Loc1
+        ipv4:
+          addresses:
+            - ip: 10.12.11.1/24
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:1211::1/64
+      1311:
+        desc: VL1311_Purpose13_Loc1
+        ipv4:
+          addresses:
+            - ip: 10.13.11.1/24
+        ipv6:
+          addresses:
+            - ip: fda4:bfb5:ac20:1311::1/64
+protocols: [tcp, udp, icmp, 'tcp,udp', any, 1, 6, 47, 58, 89, 132, 255]
+default-applications:
+  junos-ftp:
+    protocol: tcp
+    port: 21
+  junos-tftp:
+    protocol: udp
+    port: 69
+  junos-rtsp:
+    protocol: tcp
+    port: 554
+  junos-netbios-session:
+    protocol: tcp
+    port: 139
+  junos-smb-session:
+    protocol: tcp
+    port: 445
+  junos-ssh:
+    protocol: tcp
+    port: 22
+  junos-telnet:
+    protocol: tcp
+    port: 23
+  junos-smtp:
+    protocol: tcp
+    port: 25
+  junos-tacacs:
+    protocol: tcp
+    port: 49
+  junos-tacacs-ds:
+    protocol: tcp
+    port: 65
+  junos-dhcp-client:
+    protocol: udp
+    port: 68
+  junos-dhcp-server:
+    protocol: udp
+    port: 67
+  junos-bootpc:
+    protocol: udp
+    port: 68
+  junos-bootps:
+    protocol: udp
+    port: 67
+  junos-finger:
+    protocol: tcp
+    port: 79
+  junos-http:
+    protocol: tcp
+    port: 80
+  junos-https:
+    protocol: tcp
+    port: 443
+  junos-pop3:
+    protocol: tcp
+    port: 110
+  junos-ident:
+    protocol: tcp
+    port: 113
+  junos-nntp:
+    protocol: tcp
+    port: 119
+  junos-ntp:
+    protocol: udp
+    port: 123
+  junos-imap:
+    protocol: tcp
+    port: 143
+  junos-imaps:
+    protocol: tcp
+    port: 993
+  junos-bgp:
+    protocol: tcp
+    port: 179
+  junos-ldap:
+    protocol: tcp
+    port: 389
+  junos-snpp:
+    protocol: tcp
+    port: 444
+  junos-biff:
+    protocol: udp
+    port: 512
+  junos-who:
+    protocol: udp
+    port: 513
+  junos-syslog:
+    protocol: udp
+    port: 514
+  junos-printer:
+    protocol: tcp
+    port: 515
+  junos-rip:
+    protocol: udp
+    port: 520
+  junos-radius:
+    protocol: udp
+    port: 1812
+  junos-radacct:
+    protocol: udp
+    port: 1813
+  junos-nfsd-tcp:
+    protocol: tcp
+    port: 2049
+  junos-nfsd-udp:
+    protocol: udp
+    port: 2049
+  junos-cvspserver:
+    protocol: tcp
+    port: 2401
+  junos-ldp-tcp:
+    protocol: tcp
+    port: 646
+  junos-ldp-udp:
+    protocol: udp
+    port: 646
+  junos-xnm-ssl:
+    protocol: tcp
+    port: 3220
+  junos-xnm-clear-text:
+    protocol: tcp
+    port: 3221
+  junos-ike:
+    protocol: udp
+    port: 500
+  any:
+    protocol: any
+  junos-aol:
+    protocol: 6
+    port: 5190-5193
+  junos-chargen:
+    protocol: udp
+    port: 19
+  junos-dhcp-relay:
+    protocol: udp
+    port: 67
+  junos-discard:
+    protocol: udp
+    port: 9
+  junos-dns-udp:
+    protocol: udp
+    port: 53
+  junos-dns-tcp:
+    protocol: tcp
+    port: 53
+  junos-echo:
+    protocol: udp
+    port: 7
+  junos-gopher:
+    protocol: tcp
+    port: 70
+  junos-gtp:
+    protocol: udp
+    port: 2123
+  junos-gnutella:
+    protocol: udp
+    port: 6346-6347
+  junos-gre:
+    protocol: 47
+  junos-http-ext:
+    protocol: tcp
+    port: 7001
+  junos-icmp-all:
+    protocol: icmp
+  junos-icmp-ping:
+    protocol: icmp
+  junos-internet-locator-service:
+    protocol: tcp
+    port: 389
+  junos-ike-nat:
+    protocol: udp
+    port: 4500
+  junos-irc:
+    protocol: tcp
+    port: 6660-6669
+  junos-l2tp:
+    protocol: udp
+    port: 1701
+  junos-lpr:
+    protocol: tcp
+    port: 515
+  junos-mail:
+    protocol: tcp
+    port: 25
+  junos-h323:
+    protocol: tcp,udp
+    port: 1720,1719,1503,389,522,1731
+  junos-mgcp-ua:
+    protocol: udp
+    port: 2427
+  junos-mgcp-ca:
+    protocol: udp
+    port: 2727
+  junos-msn:
+    protocol: tcp
+    port: 1863
+  junos-ms-rpc-tcp:
+    protocol: tcp
+    port: 135
+  junos-ms-rpc-udp:
+    protocol: udp
+    port: 135
+  junos-ms-rpc-epm:
+    protocol: tcp
+  junos-ms-rpc-msexchange-directory-rfr:
+    protocol: tcp
+  junos-ms-rpc-msexchange-info-store:
+    protocol: tcp
+  junos-ms-rpc-msexchange-directory-nsp:
+    protocol: tcp
+  junos-ms-rpc-wmic-admin:
+    protocol: tcp
+  junos-ms-rpc-wmic-webm-level1login:
+    protocol: tcp
+  junos-ms-rpc-wmic-admin2:
+    protocol: tcp
+  junos-ms-rpc-wmic-mgmt:
+    protocol: tcp
+  junos-ms-rpc-iis-com-1:
+    protocol: tcp
+  junos-ms-rpc-iis-com-adminbase:
+    protocol: tcp
+  junos-ms-rpc-uuid-any-tcp:
+    protocol: tcp
+  junos-ms-rpc-uuid-any-udp:
+    protocol: udp
+  junos-ms-sql:
+    protocol: tcp
+    port: 1433
+  junos-nbname:
+    protocol: udp
+    port: 137
+  junos-nbds:
+    protocol: udp
+    port: 138
+  junos-nfs:
+    protocol: udp
+    port: 111
+  junos-ns-global:
+    protocol: tcp
+    port: 15397
+  junos-ns-global-pro:
+    protocol: tcp
+    port: 15397
+  junos-nsm:
+    protocol: udp
+    port: 69
+  junos-ospf:
+    protocol: 89
+  junos-pc-anywhere:
+    protocol: udp
+    port: 5632
+  junos-ping:
+    protocol: 1
+  junos-pingv6:
+    protocol: 58
+  junos-icmp6-dst-unreach-addr:
+    protocol: 58
+  junos-icmp6-dst-unreach-admin:
+    protocol: 58
+  junos-icmp6-dst-unreach-beyond:
+    protocol: 58
+  junos-icmp6-dst-unreach-port:
+    protocol: 58
+  junos-icmp6-dst-unreach-route:
+    protocol: 58
+  junos-icmp6-echo-reply:
+    protocol: 58
+  junos-icmp6-echo-request:
+    protocol: 58
+  junos-icmp6-packet-to-big:
+    protocol: 58
+  junos-icmp6-param-prob-header:
+    protocol: 58
+  junos-icmp6-param-prob-nexthdr:
+    protocol: 58
+  junos-icmp6-param-prob-option:
+    protocol: 58
+  junos-icmp6-time-exceed-reassembly:
+    protocol: 58
+  junos-icmp6-time-exceed-transit:
+    protocol: 58
+  junos-icmp6-all:
+    protocol: 58
+  junos-pptp:
+    protocol: tcp
+    port: 1723
+  junos-realaudio:
+    protocol: tcp
+    port: 554
+  junos-sccp:
+    protocol: tcp
+    port: 2000
+  junos-sctp-any:
+    protocol: 132
+  junos-sip:
+    protocol: tcp,udp
+    port: 5060,5060
+  junos-rsh:
+    protocol: tcp
+    port: 514
+  junos-smb:
+    protocol: tcp
+    port: 139,445
+  junos-sql-monitor:
+    protocol: udp
+    port: 1434
+  junos-sqlnet-v1:
+    protocol: tcp
+    port: 1525
+  junos-sqlnet-v2:
+    protocol: tcp
+    port: 1521
+  junos-sun-rpc-tcp:
+    protocol: tcp
+    port: 111
+  junos-sun-rpc-udp:
+    protocol: udp
+    port: 111
+  junos-sun-rpc-portmap-tcp:
+    protocol: tcp
+  junos-sun-rpc-portmap-udp:
+    protocol: udp
+  junos-sun-rpc-nfs-tcp:
+    protocol: tcp
+  junos-sun-rpc-nfs-udp:
+    protocol: udp
+  junos-sun-rpc-mountd-tcp:
+    protocol: tcp
+  junos-sun-rpc-mountd-udp:
+    protocol: udp
+  junos-sun-rpc-ypbind-tcp:
+    protocol: tcp
+  junos-sun-rpc-ypbind-udp:
+    protocol: udp
+  junos-sun-rpc-status-tcp:
+    protocol: tcp
+  junos-sun-rpc-status-udp:
+    protocol: udp
+  junos-sun-rpc-ypserv-tcp:
+    protocol: tcp
+  junos-sun-rpc-ypserv-udp:
+    protocol: udp
+  junos-sun-rpc-rquotad-tcp:
+    protocol: tcp
+  junos-sun-rpc-rquotad-udp:
+    protocol: udp
+  junos-sun-rpc-nlockmgr-tcp:
+    protocol: tcp
+  junos-sun-rpc-nlockmgr-udp:
+    protocol: udp
+  junos-sun-rpc-ruserd-tcp:
+    protocol: tcp
+  junos-sun-rpc-ruserd-udp:
+    protocol: udp
+  junos-sun-rpc-sadmind-tcp:
+    protocol: tcp
+  junos-sun-rpc-sadmind-udp:
+    protocol: udp
+  junos-sun-rpc-sprayd-tcp:
+    protocol: tcp
+  junos-sun-rpc-sprayd-udp:
+    protocol: udp
+  junos-sun-rpc-walld-tcp:
+    protocol: tcp
+  junos-sun-rpc-walld-udp:
+    protocol: udp
+  junos-sun-rpc-any-tcp:
+    protocol: tcp
+  junos-sun-rpc-any-udp:
+    protocol: udp
+  junos-talk:
+    protocol: tcp,udp
+    port: 517,517
+  junos-ntalk:
+    protocol: tcp,udp
+    port: 518,518
+  junos-r2cp:
+    protocol: udp
+    port: 28672
+  junos-tcp-any:
+    protocol: tcp
+  junos-udp-any:
+    protocol: udp
+  junos-uucp:
+    protocol: udp
+    port: 540
+  junos-vdo-live:
+    protocol: udp
+    port: 7000-7010
+  junos-vnc:
+    protocol: tcp
+    port: 5800
+  junos-wais:
+    protocol: tcp
+    port: 210
+  junos-whois:
+    protocol: tcp
+    port: 43
+  junos-winframe:
+    protocol: tcp
+    port: 1494
+  junos-x-windows:
+    protocol: tcp
+    port: 6000-6063
+  junos-ymsg:
+    protocol: tcp,udp
+    port: 5000-5010,5050,5000-5010,5050
+  junos-wxcontrol:
+    protocol: tcp
+    port: 3578
+  junos-snmp-agentx:
+    protocol: tcp
+    port: 705
+  junos-stun:
+    protocol: tcp,udp
+    port: 3478-3479,3478-3479
+  junos-persistent-nat:
+    protocol: 255
+    port: 65535
+default-applicationsets:
+  junos-routing-inbound: [junos-bgp, junos-rip, junos-ldp-tcp, junos-ldp-udp]
+  junos-cifs: [junos-netbios-session, junos-smb-session]
+  junos-mgcp: [junos-mgcp-ua, junos-mgcp-ca]
+  junos-ms-rpc: [junos-ms-rpc-tcp, junos-ms-rpc-udp]
+  junos-ms-rpc-msexchange: [junos-ms-rpc-tcp, junos-ms-rpc-udp, junos-ms-rpc-epm,
+    junos-ms-rpc-msexchange-directory-rfr, junos-ms-rpc-msexchange-info-store, junos-ms-rpc-msexchange-directory-nsp]
+  junos-ms-rpc-wmic: [junos-ms-rpc-tcp, junos-ms-rpc-wmic-admin, junos-ms-rpc-wmic-admin2,
+    junos-ms-rpc-wmic-webm-level1login, junos-ms-rpc-wmic-mgmt]
+  junos-ms-rpc-iis-com: [junos-ms-rpc-tcp, junos-ms-rpc-iis-com-1, junos-ms-rpc-iis-com-adminbase]
+  junos-ms-rpc-any: [junos-ms-rpc-tcp, junos-ms-rpc-udp, junos-ms-rpc-uuid-any-tcp,
+    junos-ms-rpc-uuid-any-udp]
+  junos-sun-rpc: [junos-sun-rpc-tcp, junos-sun-rpc-udp]
+  junos-sun-rpc-portmap: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp]
+  junos-sun-rpc-nfs: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-nfs-tcp, junos-sun-rpc-nfs-udp]
+  junos-sun-rpc-mountd: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-mountd-tcp, junos-sun-rpc-mountd-udp]
+  junos-sun-rpc-ypbind: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-ypbind-tcp, junos-sun-rpc-ypbind-udp]
+  junos-sun-rpc-status: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-status-tcp, junos-sun-rpc-status-udp]
+  junos-sun-rpc-nfs-access: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-nfs-tcp, junos-sun-rpc-nfs-udp, junos-sun-rpc-mountd-tcp,
+    junos-sun-rpc-mountd-udp]
+  junos-sun-rpc-ypserv: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-ypserv-tcp, junos-sun-rpc-ypserv-udp]
+  junos-sun-rpc-rquotad: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-rquotad-tcp, junos-sun-rpc-rquotad-udp]
+  junos-sun-rpc-nlockmgr: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-nlockmgr-tcp, junos-sun-rpc-nlockmgr-udp]
+  junos-sun-rpc-ruserd: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-ruserd-tcp, junos-sun-rpc-ruserd-udp]
+  junos-sun-rpc-sadmind: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-sadmind-tcp, junos-sun-rpc-sadmind-udp]
+  junos-sun-rpc-sprayd: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-sprayd-tcp, junos-sun-rpc-sprayd-udp]
+  junos-sun-rpc-walld: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-portmap-tcp,
+    junos-sun-rpc-portmap-udp, junos-sun-rpc-walld-tcp, junos-sun-rpc-walld-udp]
+  junos-sun-rpc-any: [junos-sun-rpc-tcp, junos-sun-rpc-udp, junos-sun-rpc-any-tcp,
+    junos-sun-rpc-any-udp]
+applications:
+  syslog:
+    protocol: udp
+    port: 1516
+  check_mk:
+    protocol: tcp
+    port: 6556
+  test:
+    protocol: tcp
+    port: 10000
+  mysql:
+    protocol: tcp
+    port: 3306
+  ssh:
+    protocol: tcp
+    port: 22
+  ntp:
+    protocol: udp
+    port: 123
+  asterisk-manager:
+    protocol: tcp
+    port: 5038
+  telnet_2037:
+    protocol: tcp
+    port: 2037
+  snmp:
+    protocol: udp
+    port: 161
+  snmp-trap:
+    protocol: udp
+    port: 162
+  nfs4:
+    protocol: tcp
+    port: 2049
+  ms-rdp-135:
+    protocol: tcp
+    port: 135
+  ms-rdp-3389:
+    protocol: tcp
+    port: 3389
+  ms-rdp-dynamic:
+    protocol: tcp
+    port: 49152-65535
+  smb-445:
+    protocol: tcp
+    port: 445
+  smb-445-udp:
+    protocol: udp
+    port: 445
+  netbios-ns-137-udp:
+    protocol: udp
+    port: 137
+  netbios-dgm-138-udp:
+    protocol: udp
+    port: 138
+  netbios-ssn-139-tcp:
+    protocol: tcp
+    port: 139
+  puppet:
+    protocol: tcp
+    port: 8140
+  cal:
+    protocol: tcp
+    port: 588
+  kerberos-88:
+    protocol: tcp
+    port: 88
+  kerberos-88-udp:
+    protocol: udp
+    port: 88
+  LDAP-389:
+    protocol: tcp
+    port: 389
+  LDAP-389-udp:
+    protocol: udp
+    port: 389
+  LDAP-686:
+    protocol: tcp
+    port: 686
+  DNS-53:
+    protocol: tcp
+    port: 53
+  DNS-53-udp:
+    protocol: udp
+    port: 53
+  wbem-http:
+    protocol: tcp
+    port: 5988
+  wbem-http-udp:
+    protocol: udp
+    port: 5988
+  wbem-https:
+    protocol: tcp
+    port: 5989
+  wbem-https-udp:
+    protocol: udp
+    port: 5989
+  syslog-tcp:
+    protocol: tcp
+    port: 514
+  syslog-ssl:
+    protocol: tcp
+    port: 1514
+  LDAPS-636:
+    protocol: tcp
+    port: 636
+  mssql:
+    protocol: tcp
+    port: 1433
+  xmpp:
+    protocol: tcp
+    port: 5222
+  netconf:
+    protocol: tcp
+    port: 830
+  upnp-tcp-1900:
+    protocol: tcp
+    port: 1900
+  upnp-udp-1900:
+    protocol: udp
+    port: 1900
+  upnp-tcp-2869:
+    protocol: tcp
+    port: 2869
+  upnp-udp-2869:
+    protocol: udp
+    port: 2869
+  wins-tcp:
+    protocol: tcp
+    port: 1512
+  wins-udp:
+    protocol: udp
+    port: 1512
+  wins-repli-tcp:
+    protocol: tcp
+    port: 42
+  wins-repli-udp:
+    protocol: udp
+    port: 42
+  netbios-137-tcp:
+    protocol: tcp
+    port: 137
+  tcp5000:
+    protocol: tcp
+    port: 5000
+  tcp3000:
+    protocol: tcp
+    port: 3000
+  ddc:
+    protocol: tcp
+    port: 52800-52900
+  LDAPS-636-UDP:
+    protocol: udp
+    port: 636
+  LDAPS-7636-TCP:
+    protocol: tcp
+    port: 7636
+  LDAPS-7636-UDP:
+    protocol: udp
+    port: 7636
+applicationsets:
+  MgmtApps: [junos-ping, junos-ssh]
+  monitoring: [check_mk, junos-ping]
+  monitoring-sip: [check_mk, junos-ping, junos-sip, asterisk-manager]
+  ms-rdp: [ms-rdp-135, ms-rdp-3389, ms-rdp-dynamic]
+  netbios: [netbios-ns-137-udp, netbios-dgm-138-udp, netbios-ssn-139-tcp,
+    smb-445, smb-445-udp]
+  LDAPS:
+    - LDAPS-636
+    - LDAPS-636-UDP
+    - LDAPS-7636-TCP
+    - LDAPS-7636-UDP
+policies:
+  allow-HostX-to-HostY:
+    fromzone: Purpose10
+    tozone: Purpose12
+    source: HostX
+    destination: HostY
+    application: [junos-icmp-ping, junos-http, junos-https]
+    action: permit
+  allow-Purpose11-to-Purpose10:
+    fromzone: Purpose11
+    tozone: Purpose10
+    source: Purpose11_network
+    destination: any
+    application: any
+    action: permit
+  allow-server-to-ntp-dns:
+    fromzone: Server
+    tozone: Mgmt
+    source: Server_network
+    destination: mgmt-server
+    application: [junos-dns-udp, junos-ntp, junos-ping]
+    action: permit
+  allow-server-to-untrus:
+    fromzone: Server
+    tozone: untrust
+    source: Server_network
+    destination: any
+    application: any
+    action: permit
+  allow-networkdevices-to-syslog:
+    fromzone: NetworkDevices
+    tozone: InternalServer
+    source: NetworkDevices_network
+    destination: logserver
+    application: [junos-syslog, junos-ping, junos-pingv6]
+    action: permit
+zones:
+  untrust:
+    addresses:
+      PA-Space_200.200.200.0/22: 200.200.200.0/22
+    ids_screen: untrust-screen
+    interfaces: reth0.101
+  Purpose10:
+    addresses:
+      Purpose10_network_v4: 10.10.0.0/16
+      Purpose10_network_v6: fda4:bfb5:ac20:10::/56
+      HostX: 10.10.0.2/32
+    addrsets:
+      Purpose10_network: [Purpose10_network_v4, Purpose10_network_v6]
+    interfaces: [reth1.1010, reth2.1011]
+  Purpose11:
+    addresses:
+      Purpose11_network_v4: 10.11.0.0/16
+      Purpose11_network_v6: fda4:bfb5:ac20:11::/56
+    addrsets:
+      Purpose11_network: [Purpose11_network_v4, Purpose11_network_v6]
+    interfaces: [reth1.1110, reth2.1111]
+  Purpose12:
+    addresses:
+      Purpose12_network_v4: 10.12.0.0/16
+      Purpose12_network_v6: fda4:bfb5:ac20:12::/56
+      HostY: 10.12.1.2/32
+    addrsets:
+      Purpose12_network: [Purpose12_network_v4, Purpose12_network_v6]
+    interfaces: [reth1.1210, reth2.1211]
+  Purpose13:
+    addresses:
+      Purpose13_network_v4: 10.13.0.0/16
+      Purpose13_network_v6: fda4:bfb5:ac20:13::/56
+    addrsets:
+      Purpose13_network: [Purpose13_network_v4, Purpose13_network_v6]
+    interfaces: [reth1.1310, reth2.1311]
+policy_options:
+  prefix_lists:
+    - name: Mgmt
+      prefixes:
+        - 10.1.2.0/24
+        - 10.2.3.0/24
+source_nat:
+  pools:
+    src-nat-pool: 200.200.200.202/32
+  rule_sets:
+    server-to-untrust:
+      fromzone: Server
+      tozone: untrust
+      source: 10.1.2.0/24
+      destination: 0.0.0.0/0
+      action: src-nat-pool
+    Purpose12-to-untrust:
+      fromzone: Purpose12
+      tozone: untrust
+      source: 10.12.0.0/16
+      destination: 0.0.0.0/0
+      action: src-nat-pool
+firewall:
+  filter:
+    firewall-mgmt:
+      terms:
+        001_inbound-mgmt-access:
+          source_list: Mgmt
+          destination_address: 200.200.200.201/32
+          destination_port: ssh
+          protocol: tcp
+          action: accept
+        002_reject-other-mgmt-access:
+          destination_address: 200.200.200.201/32
+          destination_port: ssh
+          protocol: tcp
+          action: reject

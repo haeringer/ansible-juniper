@@ -1,0 +1,65 @@
+---
+location: Loc2.R01.R01
+rstp:
+  bridge_prio: 32k
+ae_ranges:
+  switch-links:
+    members: ae0
+    mode: trunk
+    vlans: all
+if_ranges:
+  access-ports:
+    member_ranges:
+      - ge-0/0/0 to ge-0/0/11
+    mode: access
+  VL1111-ports:
+    member_ranges:
+      - ge-0/0/5 to ge-0/0/9
+    vlans: 1111
+interfaces:
+  ge-0/0/0:
+    desc: dot1x 1
+  ge-0/0/1:
+    desc: dot1x 2
+  ge-0/0/2:
+    desc: dot1x 3
+  ge-0/0/3:
+    desc: dot1x 4
+  ge-0/0/4:
+    desc: dot1x 5
+  ge-0/0/5:
+    desc: VL1111 1
+  ge-0/0/6:
+    desc: VL1111 2
+  ge-0/0/7:
+    desc: VL1111 3
+  ge-0/0/8:
+    desc: VL1111 4
+  ge-0/0/9:
+    desc: VL1111 5
+  ge-0/0/10:
+    desc: VL1211 hostX
+    vlans: 1211
+  ge-0/0/11:
+    desc: VL1311 hostY
+    vlans: 1311
+  xe-0/1/0:
+    desc: coreswitch1.loc2 xe-0/0/0
+    etheroptions:
+      lacp_interface: ae0
+  xe-0/1/1:
+    desc: coreswitch1.loc2 xe-1/0/0
+    etheroptions:
+      lacp_interface: ae0
+  ae0:
+    desc: coreswitch1.loc2 ae0
+    speed_individual_links: 10g
+vlan_units:
+  1011:
+    desc: "{{ inventory_hostname }} Mgmt"
+    ipv4:
+      addresses:
+        - ip: 10.10.11.3/24
+    ipv6:
+      addresses:
+        - ip: fda4:bfb5:ac20:1011::3/64

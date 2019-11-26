@@ -1,0 +1,16 @@
+---
+vlan_groups:
+  reg1_loc1:
+    1010: VL1010_Purpose10_Loc1
+    1110: VL1110_Purpose11_Loc1
+    1210: VL1210_Purpose12_Loc1
+    1310: VL1310_Purpose13_Loc1
+  reg1_loc2:
+    1011: VL1011_Purpose10_Loc2
+    1111: VL1111_Purpose11_Loc2
+    1211: VL1211_Purpose12_Loc2
+    1311: VL1311_Purpose13_Loc2
+  reg1_loc-all:
+    4001: VL4001_Purpose4001_Loc-all
+    4002: VL4002_Purpose4002_Loc-all
+    4003: VL4003_Purpose4003_Loc-all

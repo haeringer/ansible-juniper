@@ -1,0 +1,8 @@
+---
+routing:
+  v4_defaultgw: 10.10.11.1
+  v6_defaultgw: fda4:bfb5:ac20:1011::1
+group:
+  vlan_groups:
+    - reg1_loc2
+    - reg1_loc-all

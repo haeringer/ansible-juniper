@@ -1,0 +1,61 @@
+---
+routing:
+  v4_defaultgw: 10.10.10.1
+  v6_defaultgw: fda4:bfb5:ac20:1010::1
+location: Loc1.R02.R01
+rstp:
+  bridge_prio: 8k
+virtualchassis:
+  members:
+    0:
+      role: routing-engine
+      serial: AB1234567890
+    1:
+      role: routing-engine
+      serial: BC2345678901
+ae_ranges:
+  switch-links:
+    members: [ae0, ae1, ae32]
+    speed_individual_links: 10g
+    mode: trunk
+    vlans: all
+interfaces:
+  xe-0/0/0:
+    desc: switch1.loc1 xe-0/1/0
+    etheroptions:
+      lacp_interface: ae0
+  xe-1/0/0:
+    desc: switch1.loc1 xe-1/1/0
+    etheroptions:
+      lacp_interface: ae0
+  xe-0/0/1:
+    desc: switch2.loc1 xe-0/1/0
+    etheroptions:
+      lacp_interface: ae1
+  xe-1/0/1:
+    desc: switch2.loc1 xe-0/1/1
+    etheroptions:
+      lacp_interface: ae1
+  xe-0/0/32:
+    desc: Uplink1-a
+    etheroptions:
+      lacp_interface: ae32
+  xe-1/0/32:
+    desc: Uplink1-b
+    etheroptions:
+      lacp_interface: ae32
+  ae0:
+    desc: switch1.loc1 LAG
+  ae1:
+    desc: switch2.loc1 LAG
+  ae32:
+    desc: Uplink1 LAG
+vlan_units:
+  1010:
+    desc: "{{ inventory_hostname }} Mgmt"
+    ipv4:
+      addresses:
+        - ip: 10.10.10.2/24
+    ipv6:
+      addresses:
+        - ip: fda4:bfb5:ac20:1010::2/64
