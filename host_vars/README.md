@@ -475,8 +475,8 @@ group:
 ```
 # group_vars/region1_location1.yml
 routing:
-  v4_defaultgw: 10.32.17.1
-  v6_defaultgw: 2a02:f28:f:3217::1
+  v4_defaultgw: 10.1.1.1
+  v6_defaultgw: fda4:bfb5:ac20:1234::1
 group:
   vlan_groups:
     - region1_loc-all
