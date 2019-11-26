@@ -1,6 +1,6 @@
 {# chassis config template macro #}
 
-{% macro junos_ex_int() -%}
+{% macro junos_ex() -%}
 chassis {
     {% if virtualchassis is defined %}
     redundancy {
@@ -27,34 +27,7 @@ chassis {
 }
 {%- endmacro %}
 
-{% macro junos_ex_ext() -%}
-chassis {
-    {% if virtualchassis is defined %}
-    redundancy {
-        graceful-switchover;
-    }
-    {% endif %}
-    {% set ns = namespace(ae_devices=false,ae_count=0) %}
-    {% for _iface in interfaces if 'ae' in _iface %}
-        {% set ns.ae_count = ns.ae_count + 1 %}
-        {% set ns.ae_devices = true %}
-    {% endfor %}
-    {% if ns.ae_devices == true %}
-    aggregated-devices {
-        ethernet {
-            device-count {{ ns.ae_count }};
-        }
-    }
-    {% endif %}
-    alarm {
-        management-ethernet {
-            link-down ignore;
-        }
-    }
-}
-{%- endmacro %}
-
-{% macro junos_srx_int() -%}
+{% macro junos_srx() -%}
 chassis {
 {% if cluster is defined %}
     cluster {

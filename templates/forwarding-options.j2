@@ -29,7 +29,7 @@ ethernet-switching-options {
 {%- endmacro %}
 
 
-{% macro junos_srx_int() -%}
+{% macro junos_srx() -%}
 forwarding-options {
 {% if dhcp.helpers is defined %}
     helpers {

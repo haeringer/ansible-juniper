@@ -5,7 +5,7 @@ snmp {
     location "{{ location }}";
     contact "{{ snmp.contact }}";
     {% if snmp_clients is defined %}
-    client-list exampleorg-Monitoring {
+    client-list MONITORING {
         {% for client in snmp_clients %}
         {{ client }};
         {% endfor %}
@@ -14,7 +14,7 @@ snmp {
     community {{ snmp.community }} {
         authorization read-only;
     {% if snmp_clients is defined %}
-        client-list-name exampleorg-Monitoring;
+        client-list-name MONITORING;
     {% endif %}
     }
     trap-group default {
