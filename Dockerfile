@@ -1,6 +1,6 @@
 FROM python:3.7-slim
 
-LABEL Name="exampleorg NOC Ansible-Juniper Docker Image"
+LABEL Name="Ansible-Juniper Docker Image"
 
 ARG key
 ARG username
