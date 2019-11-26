@@ -85,6 +85,7 @@ security {
             }
 {% endfor %}
         }
+{% if destination_nat is defined %}
         destination {
 {% for pool_name in destination_nat.pools %}
 {% set pool = destination_nat.pools[pool_name] %}
@@ -107,6 +108,7 @@ security {
             }
 {% endfor %}
         }
+{% endif %}
 {% if proxy_arp is defined %}
         proxy-arp {
     {% for entry in proxy_arp %}
