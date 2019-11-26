@@ -7,6 +7,7 @@ This is an example layout for provisioning a Juniper-based network infrastructur
 - Reusable roles for individual tasks like building configs or pushing to devices
 - Integrated tests of network / protocol status with Jsnapy
 - Flexible execution of playbook tasks via predefined tags
+- A flag for generating config in Junos ELS (default) as well as legacy syntax
 
 
 ## Preparation
@@ -35,9 +36,7 @@ When building this Docker image with the provided docker-compose file, you need 
     cd ansible-juniper
     docker-compose build --build-arg key="$(cat ~/.ssh/[yourprivatekey] | tr '\n' ';')"
     docker-compose run ansible-juniper bash
-
-Add your SSH key to the ssh-agent:
-
+    # Add your SSH key to the ssh-agent:
     eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa
 
 
