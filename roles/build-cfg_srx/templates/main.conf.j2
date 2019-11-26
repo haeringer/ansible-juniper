@@ -1,0 +1,28 @@
+#jinja2:lstrip_blocks: True
+
+{%- import 'templates/groups.j2' as _groups with context -%}
+{%- import 'templates/system.j2' as _system with context -%}
+{%- import 'templates/chassis.j2' as _chassis with context -%}
+{%- import 'templates/interfaces.j2' as _interfaces with context -%}
+{%- import 'templates/forwarding-options.j2' as _forwarding_options with context -%}
+{%- import 'templates/snmp.j2' as _snmp with context -%}
+{%- import 'templates/routing-options.j2' as _routing_options with context -%}
+{%- import 'templates/protocols.j2' as _protocols with context -%}
+{%- import 'templates/policy-options.j2' as _policy_options with context -%}
+{%- import 'templates/security.j2' as _security with context -%}
+{%- import 'templates/firewall.j2' as _firewall with context -%}
+{%- import 'templates/applications.j2' as _applications with context -%}
+
+
+{# config-template macros #}
+{{ _groups.junos_srx() }}
+{{ _system.junos_srx() }}
+{{ _chassis.junos_srx() }}
+{{ _interfaces.junos_general() }}
+{{ _forwarding_options.junos_srx() }}
+{{ _snmp.junos_general() }}
+{{ _routing_options.junos_general() }}
+{{ _policy_options.junos_general() }}
+{{ _security.junos_srx() }}
+{{ _firewall.junos_general() }}
+{{ _applications.junos_general() }}

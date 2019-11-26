@@ -1,0 +1,14 @@
+---
+- name: '### JUNIPER SRX ###'
+  hosts: reg1_srx
+  tasks:
+
+  - import_role:
+      name: build-cfg_srx
+    connection: local
+    tags: [build-config,push-config]
+
+  - import_role:
+      name: push-config
+    when: push == 'true' or push is not defined
+    tags: push-config
